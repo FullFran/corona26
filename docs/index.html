@@ -1,0 +1,743 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>corona26 — predicting the 2026 eclipse corona from real magnetic-field data</title>
+<meta name="description" content="A PFSS reconstruction and Thomson-scattering renderer that predicts the solar corona of the 12 August 2026 total eclipse, validated against Predictive Science and against the Sun itself.">
+<meta property="og:title" content="corona26 — can I predict tomorrow's solar corona from today's magnetic field?">
+<meta property="og:description" content="Real magnetogram to PFSS ensemble to Thomson scattering. Timestamped before totality, graded by the Sun.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://fullfran.github.io/corona26/">
+<meta name="theme-color" content="#16161e">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='7' fill='%2316161e' stroke='%23e0af68' stroke-width='2'/%3E%3Cg stroke='%23e0af68' stroke-width='1.5' stroke-linecap='round' opacity='.8'%3E%3Cpath d='M16 2v4M16 26v4M2 16h4M26 16h4M6 6l3 3M23 23l3 3M26 6l-3 3M9 23l-3 3'/%3E%3C/g%3E%3C/svg%3E">
+<script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous" defer></script>
+<style>
+  :root {
+    --bg:            #1a1b26;
+    --bg-elevated:   #16161e;
+    --bg-inset:      #1f2030;
+    --fg:            #c0caf5;
+    --fg-muted:      #9aa5ce;
+    --border:        #2c3048;
+    --border-strong: #3b4166;
+    --accent:        #e0af68;
+    --accent-quiet:  #b8874a;
+    --pos:           #f7768e;
+    --neg:           #7aa2f7;
+
+    --s-12:  0.75rem;
+    --s-135: 0.844rem;
+    --s-15:  0.9375rem;
+    --s-18:  1.125rem;
+    --s-21:  1.344rem;
+    --s-26:  1.625rem;
+    --s-31:  1.938rem;
+
+    --radius-control: 6px;
+    --radius-panel:   10px;
+
+    --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", "Fira Code", Menlo, Consolas, monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font);
+    font-size: var(--s-15);
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3 {
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+    margin: 0;
+  }
+  h1 { font-size: var(--s-31); font-weight: 600; }
+  h2 { font-size: var(--s-26); font-weight: 600; }
+  h3 { font-size: var(--s-18); font-weight: 600; }
+
+  p { margin: 0 0 1rem; }
+  strong { color: #dfe6ff; font-weight: 600; }
+
+  a {
+    color: var(--accent);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+    transition: color 150ms ease-out;
+  }
+  a:hover { color: #f0c88a; }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  code, .mono { font-family: var(--mono); font-size: 0.92em; }
+
+  code:not(pre code) {
+    background: var(--bg-inset);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-control);
+    padding: 0.1em 0.35em;
+  }
+
+  pre {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-panel);
+    padding: 1rem 1.15rem;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: var(--s-135);
+    line-height: 1.6;
+    margin: 0 0 1.5rem;
+  }
+
+  .skip {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    background: var(--accent);
+    color: #16161e;
+    padding: 0.75rem 1rem;
+    font-weight: 600;
+    z-index: 80;
+    border-radius: 0 0 var(--radius-control) 0;
+  }
+  .skip:focus { left: 0; }
+
+  /* ---------- shell ---------- */
+
+  .bar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: rgba(22, 22, 30, 0.92);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: saturate(140%) blur(6px);
+  }
+  .bar__in {
+    max-width: 78rem;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+    height: 3.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .brand {
+    font-family: var(--mono);
+    font-size: var(--s-15);
+    font-weight: 600;
+    color: var(--fg);
+    text-decoration: none;
+    letter-spacing: -0.01em;
+  }
+  .brand span { color: var(--accent); }
+  .bar__spacer { flex: 1; }
+  .bar__link {
+    font-size: var(--s-135);
+    color: var(--fg-muted);
+    text-decoration: none;
+    padding: 0.55rem 0.25rem;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    transition: color 150ms ease-out;
+  }
+  .bar__link:hover { color: var(--fg); }
+
+  main { display: block; }
+
+  .wrap {
+    max-width: 78rem;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+  }
+  .prose { max-width: 72ch; }
+
+  section { padding: 3.5rem 0; border-bottom: 1px solid var(--border); }
+  section:last-of-type { border-bottom: 0; }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: var(--s-12);
+    color: var(--fg-muted);
+    margin: 0 0 0.5rem;
+  }
+
+  /* ---------- hero ---------- */
+
+  .hero { padding: 4rem 0 3.5rem; border-bottom: 1px solid var(--border); }
+  .hero h1 { margin-bottom: 1.25rem; }
+  .hero__q {
+    font-size: var(--s-21);
+    color: var(--fg);
+    border-left: 0;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-panel);
+    background: var(--bg-elevated);
+    padding: 1.15rem 1.35rem;
+    margin: 0 0 1.75rem;
+    max-width: 60ch;
+  }
+  .hero__lead { font-size: var(--s-18); color: var(--fg-muted); max-width: 68ch; }
+
+  .status {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 1.75rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .status li {
+    font-family: var(--mono);
+    font-size: var(--s-12);
+    color: var(--fg-muted);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-control);
+    padding: 0.3rem 0.6rem;
+    background: var(--bg-elevated);
+  }
+  .status b { color: var(--accent); font-weight: 600; }
+
+  #countdown { font-variant-numeric: tabular-nums; }
+
+  /* ---------- pipeline ---------- */
+
+  .pipe {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0 0 1.5rem;
+    padding: 0;
+    list-style: none;
+    counter-reset: step;
+  }
+  .pipe li {
+    display: grid;
+    grid-template-columns: 2rem 1fr;
+    gap: 0.85rem;
+    align-items: start;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-panel);
+    background: var(--bg-elevated);
+    padding: 0.85rem 1rem;
+  }
+  .pipe li::before {
+    counter-increment: step;
+    content: counter(step);
+    font-family: var(--mono);
+    font-size: var(--s-12);
+    color: var(--accent);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-control);
+    width: 2rem;
+    height: 1.7rem;
+    display: grid;
+    place-items: center;
+  }
+  .pipe b { display: block; color: #dfe6ff; }
+  .pipe span { color: var(--fg-muted); font-size: var(--s-135); }
+  .pipe em {
+    font-style: normal;
+    font-family: var(--mono);
+    font-size: var(--s-12);
+    color: var(--accent-quiet);
+  }
+
+  /* ---------- tables ---------- */
+
+  .tablewrap { overflow-x: auto; margin: 0 0 1.5rem; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--s-135);
+    min-width: 26rem;
+  }
+  caption {
+    text-align: left;
+    color: var(--fg-muted);
+    font-size: var(--s-135);
+    padding-bottom: 0.6rem;
+  }
+  th, td {
+    text-align: left;
+    padding: 0.55rem 0.9rem 0.55rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  th { color: var(--fg-muted); font-weight: 500; }
+  td.num, th.num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  tr:last-child td { border-bottom: 0; }
+  td b { color: var(--accent); }
+
+  /* ---------- figures ---------- */
+
+  figure { margin: 0 0 1.5rem; }
+  figure img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-panel);
+    background: var(--bg-elevated);
+  }
+  figcaption {
+    font-size: var(--s-135);
+    color: var(--fg-muted);
+    padding-top: 0.75rem;
+    max-width: 72ch;
+  }
+  figcaption strong { color: var(--accent); }
+
+  /* ---------- rss explorer ---------- */
+
+  .sim { border: 1px solid var(--border-strong); border-radius: var(--radius-panel); background: var(--bg-elevated); padding: 1.25rem; }
+  .sim__controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0 0 1.15rem;
+  }
+  .sim__btn {
+    font-family: var(--mono);
+    font-size: var(--s-135);
+    color: var(--fg-muted);
+    background: var(--bg-inset);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-control);
+    padding: 0.5rem 0.8rem;
+    min-height: 44px;
+    cursor: pointer;
+    transition: color 150ms ease-out, border-color 150ms ease-out, background-color 150ms ease-out;
+  }
+  .sim__btn:hover { color: var(--fg); border-color: var(--border-strong); }
+  .sim__btn[aria-pressed="true"] {
+    color: var(--accent);
+    border-color: var(--accent-quiet);
+    background: var(--bg);
+  }
+  .sim__figure img { border-color: var(--border-strong); }
+  .sim__hint { font-size: var(--s-12); color: var(--fg-muted); font-family: var(--mono); margin: 0.75rem 0 0; }
+  .htmx-request .sim__figure { opacity: 0.55; }
+  .sim__figure { transition: opacity 150ms ease-out; }
+
+  /* ---------- callout ---------- */
+
+  .note {
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-panel);
+    background: var(--bg-elevated);
+    padding: 1.1rem 1.3rem;
+    margin: 0 0 1.5rem;
+    max-width: 72ch;
+  }
+  .note p:last-child { margin-bottom: 0; }
+  .note__title {
+    font-family: var(--mono);
+    font-size: var(--s-12);
+    color: var(--accent);
+    margin: 0 0 0.5rem;
+  }
+
+  /* ---------- footer ---------- */
+
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2.5rem 0 3.5rem;
+    color: var(--fg-muted);
+    font-size: var(--s-135);
+  }
+  footer p { max-width: 72ch; }
+
+  @media (max-width: 767px) {
+    :root { --s-31: 1.7rem; --s-26: 1.44rem; }
+    section { padding: 2.5rem 0; }
+    .hero { padding: 2.75rem 0 2.5rem; }
+    .pipe li { grid-template-columns: 1.75rem 1fr; gap: 0.7rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      transition-duration: 0ms !important;
+      animation-duration: 0ms !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="bar">
+  <div class="bar__in">
+    <a class="brand" href="#top">corona<span>26</span></a>
+    <div class="bar__spacer"></div>
+    <a class="bar__link" href="#pipeline">Method</a>
+    <a class="bar__link" href="#explorer">Simulation</a>
+    <a class="bar__link" href="https://github.com/FullFran/corona26">GitHub</a>
+  </div>
+</div>
+
+<main id="main">
+
+  <div class="hero" id="top">
+    <div class="wrap prose">
+      <h1>Can I predict tomorrow&rsquo;s solar corona from today&rsquo;s magnetic field?</h1>
+
+      <p class="hero__q">
+        On 12 August 2026 the Moon removes the Sun for 37 seconds over Colmenar
+        Viejo, north of Madrid. Today the Sun&rsquo;s magnetic field has already
+        been measured. This is an attempt to cross the gap between those two
+        facts, and then find out — by looking up — how badly it went.
+      </p>
+
+      <p class="hero__lead">
+        A potential-field reconstruction of the coronal magnetic field, a
+        topology-informed electron-density model, and an exact Thomson-scattering
+        renderer. Not a thermodynamic MHD model, and it does not pretend to be
+        one. Every approximation is written down and ranked by risk.
+      </p>
+
+      <ul class="status">
+        <li>Totality in <b id="countdown">&mdash;</b></li>
+        <li>Boundary condition <b>2026-08-11 04:00 UTC</b></li>
+        <li>Ensemble <b>60 members</b></li>
+        <li>Phase <b>B of G</b></li>
+      </ul>
+    </div>
+  </div>
+
+  <section id="pipeline">
+    <div class="wrap prose">
+      <p class="eyebrow">// method</p>
+      <h2>Five stages, each with a stated approximation</h2>
+      <p>
+        The corona is visible during totality because free electrons scatter
+        photospheric light. Its shape is set almost entirely by the magnetic
+        field. So the chain runs from a measured surface field to a synthetic
+        image, and every link introduces error worth naming.
+      </p>
+
+      <ol class="pipe">
+        <li><div>
+          <b>Photospheric magnetic field</b>
+          <span>ADAPT-GONG global map, 12 realisations. <em>The far side is modelled, not observed.</em></span>
+        </div></li>
+        <li><div>
+          <b>Coronal field by PFSS</b>
+          <span>Solve &nabla;&sup2;&Phi; = 0 between the surface and a source surface. <em>Current-free, static, and the source surface is fictional.</em></span>
+        </div></li>
+        <li><div>
+          <b>Magnetic topology</b>
+          <span>Trace field lines; open ones become coronal holes, closed ones become streamers. <em>Exact, given the field.</em></span>
+        </div></li>
+        <li><div>
+          <b>Electron density</b>
+          <span>An empirical radial profile modulated by topology. <em>A proxy. This is the weakest link and it is labelled as such.</em></span>
+        </div></li>
+        <li><div>
+          <b>Thomson scattering</b>
+          <span>Integrate along every line of sight with the van de Hulst kernel. <em>Genuinely exact: the corona is optically thin, &tau; &asymp; 10&#8315;&#8310;.</em></span>
+        </div></li>
+      </ol>
+
+      <div class="note">
+        <p class="note__title">what this is not</p>
+        <p>
+          <a href="https://eclipse.predsci.com/">Predictive Science</a> run a
+          time-dependent MHD model for this eclipse, assimilating far-side
+          magnetograms from Solar Orbiter/PHI. They will be better than this.
+          That is the point of having them as a baseline — the interesting
+          question is <em>where</em> a cheap model breaks, and by how much.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section id="phase-a">
+    <div class="wrap">
+      <div class="prose">
+        <p class="eyebrow">// phase A &mdash; complete</p>
+        <h2>The uncertainty is not where you would guess</h2>
+        <p>
+          The dominant error in this whole pipeline is not the renderer and not
+          even PFSS. It is that <strong>we cannot see the far side of the
+          Sun</strong>. Global maps reconstruct the hidden hemisphere with a
+          surface flux-transport model, and August 2026 is near solar maximum,
+          when active regions evolve in days.
+        </p>
+        <p>
+          ADAPT ships twelve realisations of that reconstruction. They agree
+          almost exactly on <em>how much</em> flux exists — total unsigned flux
+          varies by only 1.14%. They disagree sharply on <em>where it is</em>,
+          and the disagreement is organised by longitude.
+        </p>
+      </div>
+
+      <figure>
+        <img src="figures/magnetogram.png"
+             alt="Three panels: the ADAPT-GONG radial magnetic field, the spread across its twelve realisations, and that spread averaged as a function of Carrington longitude"
+             width="1600" height="1500">
+        <figcaption>
+          <strong>The boundary condition and its own error bar.</strong>
+          Bottom panel: ensemble spread against longitude is effectively a map
+          of how long ago each part of the Sun was last observed.
+        </figcaption>
+      </figure>
+
+      <div class="prose">
+        <div class="tablewrap">
+          <table>
+            <caption>Ensemble spread at totality, when the disk centre sits at Carrington longitude 224.5&deg;</caption>
+            <thead>
+              <tr><th>Region</th><th class="num">Carrington longitude</th><th class="num">Spread</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Disk centre</td><td class="num">224.5&deg;</td><td class="num">1.85 G</td></tr>
+              <tr><td>West limb</td><td class="num">314.5&deg;</td><td class="num">4.11 G</td></tr>
+              <tr><td><strong>East limb</strong></td><td class="num">134.5&deg;</td><td class="num"><b>7.71 G</b></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>
+          The east limb is the edge that most recently rotated out of the far
+          side, so it is the longest unobserved. It carries <strong>4.2&times;
+          the uncertainty of disk centre</strong> — and on an eclipse image the
+          limbs are exactly where the structure lives, because streamers are
+          seen edge-on against the sky.
+        </p>
+
+        <div class="note">
+          <p class="note__title">a pre-registered prediction about our own failure</p>
+          <p>
+            If this model fails tomorrow, it should fail <strong>asymmetrically,
+            worse on the east limb</strong>. If it fails symmetrically, the
+            far-side field was not the limiting factor and something else is —
+            the source surface, or the density proxy. Either way we learn
+            something, which is more than a confident picture would have given us.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="phase-b">
+    <div class="wrap">
+      <div class="prose">
+        <p class="eyebrow">// phase B &mdash; complete</p>
+        <h2>A parameter nobody has measured</h2>
+        <p>
+          PFSS assumes the corona carries no currents, so the field is the
+          gradient of a potential satisfying Laplace&rsquo;s equation. The model&rsquo;s
+          real physical content is its upper boundary: a <em>source surface</em>
+          at radius R<sub>ss</sub> where the field is forced radial, standing in
+          for the solar wind dragging it open.
+        </p>
+        <p>
+          There is no such surface. R<sub>ss</sub> = 2.5 R<sub>&#9737;</sub> is a
+          convention from 1969, and recent work benchmarking against eclipse
+          images finds the best value moves with the solar cycle. So we do not
+          pick one — we run five, across all twelve realisations. Sixty solves,
+          124 seconds on a laptop.
+        </p>
+        <p>
+          Before trusting any of it: for a pure dipole boundary the potential
+          has a closed form, and the solver must reproduce it.
+        </p>
+        <pre>Br(r, &theta;) = b&#8320; cos&theta; &middot; (Rss&#8315;&sup3; + 2r&#8315;&sup3;) / (2 + Rss&#8315;&sup3;)</pre>
+        <p>
+          It does, to 5% at the source surface, with the polarity the right way
+          round, and it reproduces the input boundary map to 0.03% RMS. Sign
+          conventions, normalisation and the upper boundary condition are all
+          pinned by that single test.
+        </p>
+      </div>
+
+      <figure>
+        <img src="figures/pfss_ensemble.png"
+             alt="Five source-surface radial field maps with their neutral lines, from 1.3 to 3.0 solar radii, plus open flux against source surface radius"
+             width="1800" height="2085">
+        <figcaption>
+          <strong>The same Sun, five source surfaces.</strong> The yellow line is
+          the neutral line — the base of the heliospheric current sheet, where
+          the streamer belt sits.
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section id="explorer">
+    <div class="wrap">
+      <div class="prose">
+        <p class="eyebrow">// simulation</p>
+        <h2>Move the source surface yourself</h2>
+        <p>
+          These are not the same picture at different scales. As R<sub>ss</sub>
+          falls, the belt stops being a single band and breaks into several
+          distinct streamers. These predict visibly different eclipses.
+        </p>
+      </div>
+
+      <div class="sim">
+        <div class="sim__controls" role="group" aria-label="Source surface radius">
+          <button class="sim__btn" type="button" aria-pressed="false"
+                  hx-get="fragments/rss-1_3.html" hx-target="#rss-view" hx-swap="innerHTML">1.3 R&#9737;</button>
+          <button class="sim__btn" type="button" aria-pressed="false"
+                  hx-get="fragments/rss-1_5.html" hx-target="#rss-view" hx-swap="innerHTML">1.5 R&#9737;</button>
+          <button class="sim__btn" type="button" aria-pressed="false"
+                  hx-get="fragments/rss-2_0.html" hx-target="#rss-view" hx-swap="innerHTML">2.0 R&#9737;</button>
+          <button class="sim__btn" type="button" aria-pressed="true"
+                  hx-get="fragments/rss-2_5.html" hx-target="#rss-view" hx-swap="innerHTML">2.5 R&#9737;</button>
+          <button class="sim__btn" type="button" aria-pressed="false"
+                  hx-get="fragments/rss-3_0.html" hx-target="#rss-view" hx-swap="innerHTML">3.0 R&#9737;</button>
+        </div>
+
+        <div id="rss-view" aria-live="polite">
+          <figure class="sim__figure">
+            <img src="assets/rss/ss_2_5.png"
+                 alt="Source-surface radial field and neutral line for a source surface at 2.5 solar radii"
+                 width="1400" height="476">
+            <figcaption>
+              <strong>R<sub>ss</sub> = 2.5 R<sub>&#9737;</sub></strong> —
+              1.31 polarity reversals per longitude, open flux 7.2 G&nbsp;R<sub>&#9737;</sub><sup>2</sup>.
+              The conventional choice since Altschuler &amp; Newkirk (1969). One
+              dominant belt with a couple of excursions.
+            </figcaption>
+          </figure>
+        </div>
+
+        <p class="sim__hint">ADAPT-GONG 2026-08-11T04:00Z &middot; realisation 0 &middot; nr = 100</p>
+      </div>
+
+      <div class="prose" style="margin-top:2rem">
+        <h3>Which uncertainty wins, stated carefully</h3>
+        <p>
+          Open flux varies 48&times; more across the five source surfaces than
+          across the twelve boundary realisations. We are not going to lead with
+          that number: open flux is measured <em>at the source surface</em>,
+          whose radius is the parameter being varied, so part of that ratio is
+          definitional rather than physical.
+        </p>
+        <p>
+          The honest metric is the one an eclipse actually shows — where the
+          streamer belt sits on the sky.
+        </p>
+
+        <div class="tablewrap">
+          <table>
+            <caption>RMS scatter in neutral-line latitude</caption>
+            <tbody>
+              <tr><td>Across 12 ADAPT realisations, fixed R<sub>ss</sub></td><td class="num">5.3&deg;</td></tr>
+              <tr><td>Across 5 source surfaces, fixed realisation</td><td class="num">20.5&deg;</td></tr>
+              <tr><td><strong>Ratio</strong></td><td class="num"><b>3.8&times;</b></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>
+          So the ranking survives with a corrected magnitude. The source-surface
+          choice moves the streamer belt about <strong>four times</strong> as
+          much as the entire far-side uncertainty — not fifty. Both matter; the
+          fictional parameter matters more.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section id="next">
+    <div class="wrap prose">
+      <p class="eyebrow">// what is left</p>
+      <h2>Between here and totality</h2>
+      <p>
+        Field-line topology, the electron-density proxy, and then the part that
+        is actually ours to write: the Thomson-scattering renderer. A 1024&sup2;
+        image at 512 samples per ray is about 5&times;10&#8312; independent kernel
+        evaluations with no coupling between them, which is the one place in
+        this pipeline where a GPU is obviously the right tool.
+      </p>
+      <p>
+        Then the comparison against Predictive Science, and on 13 August the
+        only comparison that really counts.
+      </p>
+
+      <div class="note">
+        <p class="note__title">the rule this project runs on</p>
+        <p>
+          The prediction and the magnetogram it came from are committed and
+          pushed <strong>before totality</strong>, with the input observation
+          time recorded. The git history is the evidence. A prediction published
+          afterwards is not a prediction.
+        </p>
+      </div>
+
+      <p>
+        Success here does not mean the corona matches. It means the pipeline
+        runs, the figures exist, and the approximations are stated honestly. If
+        it matches, that is a result; if it does not, working out why is a
+        better one. The failure mode is not a wrong prediction — it is no
+        prediction.
+      </p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap prose">
+    <p>
+      Built by <a href="https://github.com/FullFran">Fran Olmedo</a> &mdash;
+      <a href="https://github.com/FullFran/corona26">source and full write-up on GitHub</a>.
+      Sibling project: <a href="https://github.com/FullFran/snow-mcrt">snow-mcrt</a>,
+      the same scattering physics at the opposite optical depth.
+    </p>
+    <p>
+      Magnetogram data: <a href="https://nso.edu/data/nisp-data/adapt-maps/">ADAPT</a> / GONG,
+      National Solar Observatory. PFSS solved with
+      <a href="https://docs.sunpy.org/projects/sunkit-magex/en/latest/">sunkit-magex</a>.
+      Thomson scattering after van de Hulst (1950) and Billings (1966).
+    </p>
+  </div>
+</footer>
+
+<script>
+  // Totality at Colmenar Viejo: 2026-08-12 20:31 CEST == 18:31 UTC.
+  (function () {
+    var el = document.getElementById('countdown');
+    if (!el) return;
+    var target = Date.UTC(2026, 7, 12, 18, 31, 0);
+    function tick() {
+      var d = target - Date.now();
+      if (d <= 0) { el.textContent = 'now'; return; }
+      var h = Math.floor(d / 3600000);
+      var m = Math.floor(d / 60000) % 60;
+      var s = Math.floor(d / 1000) % 60;
+      el.textContent = h + 'h ' + String(m).padStart(2, '0') + 'm ' + String(s).padStart(2, '0') + 's';
+      setTimeout(tick, 1000);
+    }
+    tick();
+  })();
+
+  // Keep the pressed state on the source-surface controls in sync.
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('.sim__btn');
+    if (!btn) return;
+    btn.parentElement.querySelectorAll('.sim__btn').forEach(function (b) {
+      b.setAttribute('aria-pressed', String(b === btn));
+    });
+  });
+</script>
+
+</body>
+</html>

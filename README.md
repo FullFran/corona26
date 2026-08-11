@@ -4,8 +4,10 @@ Predicting the corona of the 12 August 2026 total solar eclipse from real
 photospheric magnetic-field data — PFSS reconstruction, a topology-informed
 electron-density proxy, and an exact Thomson-scattering renderer.
 
-> **Status: Phase A complete — boundary condition acquired and characterised.**
-> Written 11 August 2026, the day before totality.
+> **Status: Phases A and B complete — boundary condition and 60-member PFSS
+> ensemble solved and validated.** Written 11 August 2026, the day before totality.
+>
+> Live write-up: **[fullfran.github.io/corona26](https://fullfran.github.io/corona26/)**
 
 ## The question
 
@@ -122,6 +124,71 @@ east limb.** If it fails symmetrically, the far-side field was not the problem
 and something else is — the source surface, or the density proxy.
 
 That is a better thing to have before an experiment than a confident picture.
+
+## Phase B: the field, and which uncertainty actually dominates
+
+![PFSS source-surface field and neutral line across the Rss ensemble](docs/figures/pfss_ensemble.png)
+
+Sixty solves — 12 ADAPT realisations × 5 source-surface radii — in **124
+seconds** on a laptop CPU. The ensemble was never the expensive part.
+
+Before trusting any of it, the solver is checked against a case with a closed
+form. For a pure dipole boundary only the `l = 1` harmonic survives and the
+potential reduces to `Φ = (a r + b/r²) cos θ`; applying `Bθ(Rss) = 0` and
+`Br(1) = b0` gives
+
+```
+Br(r, θ) = b0 cos θ · (Rss⁻³ + 2 r⁻³) / (2 + Rss⁻³)
+```
+
+The numerical solution reproduces this at the source surface to 5%, with the
+polarity the right way round, and it reproduces the input boundary map to
+**0.03% RMS**. Sign conventions, normalisation and the upper boundary
+condition are all pinned by that one test.
+
+### Then the interesting part
+
+The top five panels are the same Sun with a different source surface. They are
+not the same picture at different scales — **the topology changes**. Counting
+polarity reversals per longitude on the source surface:
+
+| `Rss` | Reversals per longitude | Open flux (G R☉²) |
+|---|---|---|
+| 1.3 | 2.63 | 32.7 |
+| 1.5 | 2.09 | 20.8 |
+| 2.0 | 1.56 | 10.8 |
+| 2.5 | 1.31 | 7.1 |
+| 3.0 | 1.14 | 5.2 |
+
+At `Rss = 1.3` the belt is multi-branched: several distinct streamers, a
+neutral line that wanders 50° in latitude. At `Rss = 3.0` it has collapsed to
+a single clean two-sector belt. **These predict visibly different eclipses.**
+
+### The number, stated carefully
+
+Open flux varies **48×** more across the five source surfaces than across the
+twelve realisations of the boundary. That comparison flatters the point and we
+are not going to lead with it: open flux is measured *at the source surface*,
+whose radius is the parameter being varied, so some of that ratio is
+definitional rather than physical.
+
+The honest metric is the one an eclipse actually shows — where the streamer
+belt sits on the sky:
+
+| Neutral-line latitude, RMS scatter | |
+|---|---|
+| across 12 ADAPT realisations, fixed `Rss` | **5.3°** |
+| across 5 source surfaces, fixed realisation | **20.5°** |
+| ratio | **3.8×** |
+
+So the ranking from Phase A survives, but with a corrected magnitude. **The
+source-surface choice moves the streamer belt about four times as much as the
+entire far-side uncertainty does** — not fifty. Both matter; the fictional
+parameter matters more.
+
+Which means the ensemble is not decoration. Publishing one image at
+`Rss = 2.5` because that is what everyone uses would have hidden the single
+largest source of error in the prediction.
 
 ## Where the compute goes
 
