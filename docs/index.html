@@ -406,6 +406,7 @@
     <a class="brand" href="#top">corona<span>26</span></a>
     <div class="bar__spacer"></div>
     <a class="bar__link" href="#pipeline" data-es="Método">Method</a>
+    <a class="bar__link" href="#prediction" data-es="Predicción">Prediction</a>
     <a class="bar__link" href="#explorer" data-es="Simulación">Simulation</a>
     <a class="bar__link" href="https://github.com/FullFran/corona26">GitHub</a>
     <div class="lang" role="group" aria-label="Language / Idioma">
@@ -439,7 +440,7 @@
         <li><span data-es="Totalidad en">Totality in</span> <b id="countdown">&mdash;</b></li>
         <li><span data-es="Condición de contorno">Boundary condition</span> <b>2026-08-11 04:00 UTC</b></li>
         <li><span data-es="Ensemble">Ensemble</span> <b><span data-es="60 miembros">60 members</span></b></li>
-        <li><span data-es="Fase">Phase</span> <b><span data-es="C de G">C of G</span></b></li>
+        <li><span data-es="Fase">Phase</span> <b><span data-es="E de G">E of G</span></b></li>
       </ul>
     </div>
   </div>
@@ -752,16 +753,94 @@
     </div>
   </section>
 
+  <section id="prediction">
+    <div class="wrap">
+      <div class="prose">
+        <p class="eyebrow" data-es="// fases D y E &mdash; completadas">// phases D and E &mdash; complete</p>
+        <h2 data-es="La predicción">The prediction</h2>
+        <p data-es="Esto es lo que el modelo dice que se verá desde un campo al norte de Madrid mañana a las 20:31 CEST. El cénit está arriba, así que es la orientación que ve el ojo, no el convenio de norte solar arriba: el norte solar queda inclinado 34,7&deg; respecto a la vertical.">
+          This is what the model says the corona will look like from a field
+          north of Madrid at 20:31 CEST tomorrow. Zenith is up, so this is the
+          orientation the eye sees, not the solar-north-up convention: solar
+          north is tilted 34.7&deg; from vertical.
+        </p>
+      </div>
+
+      <figure>
+        <img src="figures/corona_prediction.png"
+             alt="The predicted white-light corona of the 12 August 2026 eclipse, a bright inner ring with streamer lobes and dark coronal hole wedges, oriented as seen from Colmenar Viejo"
+             width="1530" height="1620">
+        <figcaption data-es="<strong>La corona del 12 de agosto de 2026, predicha desde el campo magnético del día anterior.</strong> Los lóbulos brillantes son streamers, plasma atrapado en campo cerrado; las cuñas oscuras son agujeros coronales, por donde escapa el viento solar.">
+          <strong>The corona of 12 August 2026, predicted from the previous
+          day's magnetic field.</strong> The bright lobes are streamers — plasma
+          trapped on closed field. The dark wedges are coronal holes, where the
+          solar wind escapes.
+        </figcaption>
+      </figure>
+
+      <div class="prose">
+        <h3 data-es="La prueba que lo valida todo de golpe">The test that pins everything at once</h3>
+        <p data-es="El Sol no es una fuente puntual: un electrón a 1,5 R<sub>&#9737;</sub> ve un disco de 42&deg; de ancho, así que el ángulo de dispersión varía a lo largo del disco y hay que integrarlo con oscurecimiento de limbo. Van de Hulst resolvió esa integral en 1950 y dejó cuatro coeficientes en forma cerrada. La prueba decisiva es que, lejos del Sol, el núcleo completo de disco finito debe colapsar sobre el patrón dipolar de libro de texto:">
+          The Sun is not a point source — an electron at 1.5 R<sub>&#9737;</sub>
+          sees a disk 42&deg; wide — so the scattering angle varies across the
+          disk and must be integrated over it with limb darkening. Van de Hulst
+          did that integral in 1950, leaving four closed-form coefficients. The
+          decisive test is that far from the Sun the full finite-disk kernel
+          must collapse onto the textbook dipole pattern:
+        </p>
+        <pre>B(&chi;) / B(90°)  &rarr;  1 + cos&sup2;(&chi;)      as r &rarr; &infin;</pre>
+        <p data-es="Lo hace, con un 0,2 %. Esa única comprobación fija el signo, la normalización y toda la integral del disco a la vez: nada más del núcleo puede estar mal mientras esa prueba pase.">
+          It does, to 0.2%. That single check pins the sign, the normalisation
+          and the whole disk integral at once — nothing else in the kernel can
+          be wrong while it passes.
+        </p>
+
+        <div class="tablewrap">
+          <table>
+            <tbody>
+              <tr><td data-es="Evaluaciones del núcleo">Kernel evaluations</td><td class="num">415M<span data-es=" por fotograma"> per frame</span></td></tr>
+              <tr><td data-es="Tiempo de render">Render time</td><td class="num">118 s<span data-es=" (NumPy, CPU)"> (NumPy, CPU)</span></td></tr>
+              <tr><td data-es="Líneas de campo trazadas">Field lines traced</td><td class="num">884k</td></tr>
+              <tr><td data-es="Convergencia de la cuadratura">Quadrature convergence</td><td class="num">0.98%<span data-es=" peor caso"> worst case</span></td></tr>
+              <tr><td data-es="Memoria pico">Peak memory</td><td class="num"><b>1.8 GB</b></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="note">
+          <p class="note__title" data-es="qué es honesto en esta imagen y qué no">what is honest here and what is not</p>
+          <p data-es="La <strong>geometría</strong> es real: posición del observador, orientación solar, ángulos de dispersión, disco ocultador. La <strong>dispersión</strong> es exacta. La <strong>topología magnética</strong> es una solución PFSS auténtica de un magnetograma real.">
+            The <strong>geometry</strong> is real: observer position, solar
+            orientation, scattering angles, the occulting disk. The
+            <strong>scattering</strong> is exact. The <strong>magnetic
+            topology</strong> is a genuine PFSS solution from a real magnetogram.
+          </p>
+          <p data-es="La <strong>densidad es un proxy</strong>: campo cerrado &times;3,5, campo abierto &times;0,4, sobre un perfil radial de Baumbach&ndash;Allen. Son mandos, fijados <em>antes</em> de cualquier comparación con Predictive Science para no poder ajustarlos hasta coincidir.">
+            The <strong>density is a proxy</strong> — closed field 3.5&times;
+            enhanced, open field 0.4&times; depleted, over a Baumbach&ndash;Allen
+            radial profile. Those are knobs, fixed <em>before</em> any comparison
+            with Predictive Science so we cannot tune our way into agreement.
+          </p>
+          <p data-es="Y la estructura es <strong>demasiado suave</strong>. Las coronas reales muestran estriaciones radiales finas; un campo potencial con una densidad de dos valores no puede producirlas. Si la corona de mañana es más afilada y filamentosa que esta &mdash; y lo será &mdash;, eso es el modelo de densidad fallando, no el renderizador.">
+            And the structure is <strong>too smooth</strong>. Real coronae show
+            fine radial striations; a potential field with a two-valued density
+            proxy cannot produce them. If tomorrow's corona is sharper and more
+            filamentary than this — and it will be — that is the density model
+            failing, not the renderer.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section id="next">
     <div class="wrap prose">
       <p class="eyebrow" data-es="// lo que queda">// what is left</p>
       <h2 data-es="De aquí a la totalidad">Between here and totality</h2>
-      <p data-es="El proxy de densidad electrónica, y después la parte que de verdad nos toca escribir: el renderizador de dispersión Thomson. Una imagen de 1024&sup2; con 512 muestras por rayo son unas 5&times;10&#8312; evaluaciones independientes del núcleo, sin acoplamiento entre ellas — el único punto de esta cadena donde una GPU es obviamente la herramienta correcta.">
-        The electron-density proxy, and then the part that is actually ours to
-        write: the Thomson-scattering renderer. A 1024&sup2; image at 512 samples
-        per ray is about 5&times;10&#8312; independent kernel evaluations with no
-        coupling between them, which is the one place in this pipeline where a
-        GPU is obviously the right tool.
+      <p data-es="Renderizar el ensemble de 60 miembros en vez de uno solo, para que la imagen lleve su propia barra de error; después, la comparación contra Predictive Science.">
+        The 60-member ensemble rendered rather than a single member, so the
+        image carries its own error bar; then the comparison against Predictive
+        Science.
       </p>
       <p data-es="Luego la comparación contra Predictive Science y, el 13 de agosto, la única comparación que cuenta de verdad.">
         Then the comparison against Predictive Science, and on 13 August the

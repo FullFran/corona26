@@ -4,8 +4,8 @@ Predicting the corona of the 12 August 2026 total solar eclipse from real
 photospheric magnetic-field data — PFSS reconstruction, a topology-informed
 electron-density proxy, and an exact Thomson-scattering renderer.
 
-> **Status: Phases A, B and C complete — boundary condition, 60-member PFSS
-> ensemble, and magnetic topology.** Written 11 August 2026, the day before totality.
+> **Status: Phases A–E complete. There is a prediction.**
+> Written 11 August 2026, the day before totality.
 >
 > Live write-up: **[www.fullfran.com/corona26](https://www.fullfran.com/corona26/)**
 
@@ -231,6 +231,71 @@ how much of the Sun is open from 20% to 8%.
 At `Rss = 2.5`, 65% of the open flux is positive, and the median flux-tube
 expansion factor is 6.6 — which is the quantity that will modulate the electron
 density in Phase D, rather than a binary open/closed flag.
+
+## Phases D and E: the prediction
+
+![The predicted corona of 12 August 2026 as seen from Colmenar Viejo](docs/figures/corona_prediction.png)
+
+**This is what the model says the corona will look like from a field north of
+Madrid at 20:31 CEST tomorrow.** Zenith is up, so this is the orientation the
+eye sees, not the solar-north-up convention: solar north is tilted 34.7° from
+vertical, a number measured by projecting the solar pole into the local
+horizontal frame rather than assembled from the position and parallactic
+angles, whose sign convention is easy to get backwards.
+
+Two things had to be true before the image meant anything.
+
+**The scattering had to be exact.** The Sun is not a point source — an electron
+at 1.5 R☉ sees a disk 42° wide — so the scattering angle varies across the
+disk and must be integrated over it with limb darkening. Van de Hulst (1950)
+did that integral analytically, leaving four closed-form coefficients. The
+decisive test is that far from the Sun the full finite-disk kernel must
+collapse onto the textbook dipole pattern:
+
+```
+B(chi) / B(90°)  →  1 + cos²(chi)      as r → ∞
+```
+
+It does, to 0.2%. That single check pins the sign, the normalisation and the
+whole disk integral at once — nothing else in the kernel can be wrong while it
+passes.
+
+**The quadrature had to be converged.** Measured, not assumed: at 512 samples
+per ray the line-of-sight integral is within **0.98% worst-case and 0.001%
+median** of an 8192-sample reference.
+
+| | |
+|---|---|
+| Kernel evaluations | 415M per frame (900² × 512) |
+| Render time | 118 s per frame, NumPy on CPU |
+| Density cube | 48 × 96 × 192, 884k field lines traced |
+| Peak memory | **1.8 GB, flat in resolution** |
+| Degree of polarisation | 0.20–0.75, median 0.61 |
+
+### What is honest about this image and what is not
+
+The **geometry** is real: observer position, solar orientation, scattering
+angles, the occulting disk. The **scattering** is exact. The **magnetic
+topology** is a genuine PFSS solution from a real magnetogram.
+
+The **density is a proxy** — closed field 3.5× enhanced, open field 0.4×
+depleted, on top of a Baumbach–Allen radial profile. Those numbers are knobs,
+fixed before any comparison with Predictive Science so that we cannot tune our
+way into agreement.
+
+And the structure is **too smooth**. Real coronae show fine radial striations;
+a potential field with a two-valued density proxy cannot produce them. If
+tomorrow's corona is sharper and more filamentary than this — and it will be —
+that is the density model failing, not the renderer.
+
+### A note on compute
+
+The first attempt at this OOM-killed the machine three times. The cause was not
+the renderer: it was that the field-line tracer preallocates a buffer of
+`n_seeds × max_steps`, so asking for 328k lines at once requested ~70 GB before
+tracing a single one. Batching the trace made peak memory constant. The whole
+pipeline now runs in **1.8 GB and about six minutes on a laptop CPU** — no GPU
+required for V1, which was rather the point.
 
 ## Where the compute goes
 

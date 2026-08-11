@@ -40,6 +40,37 @@ SEED_RADIUS = 1.01 * u.R_sun
 
 DEFAULT_MAX_STEPS = 5000
 
+# The compiled tracer preallocates one buffer of (n_seeds, max_steps, 3)
+# doubles *per call*, several times over. Memory is therefore the product of
+# the seed count and the step budget, not a function of either alone: 300k
+# seeds at 3000 steps asks for tens of gigabytes before a single line is
+# traced. Tracing in batches makes peak memory constant and costs nothing,
+# because every batch is independent anyway.
+#
+# 4000 seeds x 5000 steps x 3 x 8 bytes x ~3 buffers is roughly 1.4 GB, which
+# is the most we want to see on a laptop.
+DEFAULT_BATCH = 4000
+
+
+def _trace_in_batches(output, seeds, *, max_steps: int, batch: int = DEFAULT_BATCH):
+    """Trace seeds in fixed-size batches, keeping only what we need.
+
+    Yields ``(is_open, polarity, expansion_factor)`` arrays per batch. The
+    field-line geometry is discarded as soon as each batch is classified,
+    which is what keeps peak memory flat as the seed count grows.
+    """
+    for start in range(0, len(seeds), batch):
+        chunk = seeds[start : start + batch]
+        lines = tracing.PerformanceTracer(max_steps=max_steps).trace(chunk, output)
+        yield (
+            np.array([bool(f.is_open) for f in lines]),
+            np.array([int(f.polarity) for f in lines]),
+            np.array(
+                [float(f.expansion_factor) if f.is_open else np.nan for f in lines]
+            ),
+        )
+        del lines
+
 
 @dataclass(frozen=True)
 class Topology:
@@ -106,17 +137,16 @@ def trace_topology(
     n_lat: int = 60,
     n_lon: int = 120,
     max_steps: int = DEFAULT_MAX_STEPS,
+    batch: int = DEFAULT_BATCH,
 ) -> Topology:
     """Trace from an equal-area photospheric grid and classify every line."""
     seeds = photospheric_seeds(output.coordinate_frame, n_lat=n_lat, n_lon=n_lon)
-    field_lines = tracing.PerformanceTracer(max_steps=max_steps).trace(seeds, output)
 
+    parts = list(_trace_in_batches(output, seeds, max_steps=max_steps, batch=batch))
     shape = (n_lat, n_lon)
-    is_open = np.array([bool(f.is_open) for f in field_lines]).reshape(shape)
-    polarity = np.array([int(f.polarity) for f in field_lines]).reshape(shape)
-    expansion = np.array(
-        [float(f.expansion_factor) if f.is_open else np.nan for f in field_lines]
-    ).reshape(shape)
+    is_open = np.concatenate([p[0] for p in parts]).reshape(shape)
+    polarity = np.concatenate([p[1] for p in parts]).reshape(shape)
+    expansion = np.concatenate([p[2] for p in parts]).reshape(shape)
 
     return Topology(
         is_open=is_open,

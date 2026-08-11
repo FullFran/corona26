@@ -259,9 +259,16 @@ The Baumbach–Allen coefficients (~`1.55e8 r⁻⁶ + 2.99e8 r⁻¹⁶` in some 
 `1e8`-scale in cm⁻³) are the starting point; we fit our own normalisation so
 that the ensemble mean matches a published K-corona radial brightness profile.
 
-Note the enormous dynamic range: between 1.1 and 3 R☉ brightness falls by
-~4 orders of magnitude. Any visualisation must be log-scaled or filtered, which
-is exactly why every published eclipse-prediction image uses a radial filter.
+Note the dynamic range, now measured rather than asserted. Between 1.1 and
+3 R☉ the Baumbach–Allen **density** falls by a factor of **172** (2.2 orders),
+and the rendered **brightness** by a factor of **1857** (3.3 orders) — steeper,
+because the line-of-sight path length through dense plasma and the scattering
+kernel both shrink with height as well.
+
+Either way it is far too much range for a linear display, which is exactly why
+every published eclipse-prediction image applies a radial filter. Ours must be
+applied identically to every image in a comparison, or the comparison means
+nothing.
 
 ### Topological modulation
 
