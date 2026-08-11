@@ -19,13 +19,34 @@ FRAGMENT = """<figure class="sim__figure">
   <img src="assets/rss/ss_{slug}.png"
        alt="Source-surface radial field and neutral line for a source surface at {rss} solar radii"
        width="1400" height="476">
-  <figcaption>
+  <figcaption data-es="{caption_es}">
     <strong>R<sub>ss</sub> = {rss} R<sub>&#9737;</sub></strong> —
     {reversals} polarity reversals per longitude, open flux {flux} G&nbsp;R<sub>&#9737;</sub><sup>2</sup>.
     {commentary}
   </figcaption>
 </figure>
 """
+
+CAPTION_ES = (
+    "<strong>R<sub>ss</sub> = {rss} R<sub>&#9737;</sub></strong> — "
+    "{reversals} inversiones de polaridad por longitud, flujo abierto "
+    "{flux} G&nbsp;R<sub>&#9737;</sub><sup>2</sup>. {commentary}"
+)
+
+COMMENTARY_ES = {
+    1.3: "La banda es multi-ramificada: varios streamers distintos y una línea "
+         "neutra que serpentea más de 50&deg; en latitud. Predice una corona "
+         "cargada de estructura.",
+    1.5: "Sigue siendo multi-ramificada, pero las regiones cerradas pequeñas "
+         "empiezan a fundirse con la banda principal.",
+    2.0: "Se acerca a una banda única. La mayoría de líneas neutras secundarias "
+         "se han cerrado por debajo de la source surface.",
+    2.5: "La elección convencional desde Altschuler y Newkirk (1969). Una banda "
+         "dominante con un par de excursiones.",
+    3.0: "Una única banda limpia de dos sectores. Casi toda la estructura ha "
+         "quedado confinada bajo la source surface: una corona simple y "
+         "tranquila.",
+}
 
 COMMENTARY = {
     1.3: "The belt is multi-branched: several distinct streamers, and a neutral "
@@ -66,10 +87,14 @@ def main() -> None:
         slug = str(rss).replace(".", "_")
 
         plot_single_rss(ss, rss, assets / f"ss_{slug}.png", open_flux_value=flux)
+        caption_es = CAPTION_ES.format(
+            rss=rss, reversals=f"{rev:.2f}".replace(".", ","),
+            flux=f"{flux:.1f}".replace(".", ","), commentary=COMMENTARY_ES[rss],
+        ).replace('"', "&quot;")
         (fragments / f"rss-{slug}.html").write_text(
             FRAGMENT.format(
                 slug=slug, rss=rss, reversals=f"{rev:.2f}", flux=f"{flux:.1f}",
-                commentary=COMMENTARY[rss],
+                commentary=COMMENTARY[rss], caption_es=caption_es,
             )
         )
         summary[str(rss)] = {"open_flux": flux, "reversals": rev}

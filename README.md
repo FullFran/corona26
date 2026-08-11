@@ -4,8 +4,8 @@ Predicting the corona of the 12 August 2026 total solar eclipse from real
 photospheric magnetic-field data — PFSS reconstruction, a topology-informed
 electron-density proxy, and an exact Thomson-scattering renderer.
 
-> **Status: Phases A and B complete — boundary condition and 60-member PFSS
-> ensemble solved and validated.** Written 11 August 2026, the day before totality.
+> **Status: Phases A, B and C complete — boundary condition, 60-member PFSS
+> ensemble, and magnetic topology.** Written 11 August 2026, the day before totality.
 >
 > Live write-up: **[www.fullfran.com/corona26](https://www.fullfran.com/corona26/)**
 
@@ -189,6 +189,48 @@ parameter matters more.
 Which means the ensemble is not decoration. Publishing one image at
 `Rss = 2.5` because that is what everyone uses would have hidden the single
 largest source of error in the prediction.
+
+## Phase C: where the wind escapes
+
+![Coronal holes at the photosphere and open surface area against source surface radius](docs/figures/topology.png)
+
+Field lines integrated from **16,200 equal-area photospheric seeds** and
+classified. Closed lines return to the surface at both ends — they trap plasma,
+are overdense, and build the streamers. Open lines reach the source surface —
+plasma escapes as solar wind, the region is underdense, and it forms a coronal
+hole, dark in white light.
+
+Two correctness details that fail silently, so both are tested:
+
+- **Seeding is uniform in sin(latitude), not latitude.** A uniform-latitude
+  grid over-samples the poles, and an "open fraction" computed from it is not
+  an area fraction at all.
+- **The classification is converged.** A field line that exhausts its step
+  budget mid-flight is indistinguishable from one that escaped. Doubling the
+  budget changes **zero** of 16,200 seeds.
+
+For the analytic dipole the topology is exactly known, and the tests assert it:
+open polar caps, closed equatorial belt, exactly two transitions reading down
+any column of longitude, and opposite polarity in the two caps.
+
+| `Rss` | Open surface area | Boundary spread |
+|---|---|---|
+| 1.3 | 30.69% | 1.64 pp |
+| 1.5 | 20.43% | 1.10 pp |
+| 2.0 | 11.26% | 0.72 pp |
+| 2.5 | **7.74%** | 0.70 pp |
+| 3.0 | 5.99% | 0.56 pp |
+
+**This ratio is a clean one.** Open area varies **26×** more across source
+surfaces (24.7 percentage points) than across boundary realisations (0.94 pp).
+Unlike the open-flux comparison above, nothing here is definitional: open area
+is always measured at the *photosphere*, a fixed radius, while the parameter
+being varied lives far above it. Choosing `Rss = 2.5` instead of `1.5` changes
+how much of the Sun is open from 20% to 8%.
+
+At `Rss = 2.5`, 65% of the open flux is positive, and the median flux-tube
+expansion factor is 6.6 — which is the quantity that will modulate the electron
+density in Phase D, rather than a binary open/closed flag.
 
 ## Where the compute goes
 

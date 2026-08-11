@@ -157,6 +157,28 @@
   }
   .bar__link:hover { color: var(--fg); }
 
+  .lang {
+    display: inline-flex;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-control);
+    overflow: hidden;
+    background: var(--bg-inset);
+  }
+  .lang button {
+    font-family: var(--mono);
+    font-size: var(--s-12);
+    color: var(--fg-muted);
+    background: transparent;
+    border: 0;
+    padding: 0 0.6rem;
+    min-height: 44px;
+    min-width: 44px;
+    cursor: pointer;
+    transition: color 150ms ease-out, background-color 150ms ease-out;
+  }
+  .lang button:hover { color: var(--fg); }
+  .lang button[aria-pressed="true"] { color: var(--accent); background: var(--bg); }
+
   main { display: block; }
 
   .wrap {
@@ -383,9 +405,13 @@
   <div class="bar__in">
     <a class="brand" href="#top">corona<span>26</span></a>
     <div class="bar__spacer"></div>
-    <a class="bar__link" href="#pipeline">Method</a>
-    <a class="bar__link" href="#explorer">Simulation</a>
+    <a class="bar__link" href="#pipeline" data-es="Método">Method</a>
+    <a class="bar__link" href="#explorer" data-es="Simulación">Simulation</a>
     <a class="bar__link" href="https://github.com/FullFran/corona26">GitHub</a>
+    <div class="lang" role="group" aria-label="Language / Idioma">
+      <button type="button" data-lang="en" aria-pressed="true" lang="en">EN</button>
+      <button type="button" data-lang="es" aria-pressed="false" lang="es">ES</button>
+    </div>
   </div>
 </div>
 
@@ -393,16 +419,16 @@
 
   <div class="hero" id="top">
     <div class="wrap prose">
-      <h1>Can I predict tomorrow&rsquo;s solar corona from today&rsquo;s magnetic field?</h1>
+      <h1 data-es="¿Puedo predecir la corona solar de mañana con el campo magnético de hoy?">Can I predict tomorrow&rsquo;s solar corona from today&rsquo;s magnetic field?</h1>
 
-      <p class="hero__q">
+      <p class="hero__q" data-es="El 12 de agosto de 2026 la Luna tapa el Sol durante 37 segundos sobre Colmenar Viejo, al norte de Madrid. El campo magnético del Sol ya está medido hoy. Esto es un intento de cruzar la distancia entre esos dos hechos y averiguar después, mirando hacia arriba, cómo de mal ha salido.">
         On 12 August 2026 the Moon removes the Sun for 37 seconds over Colmenar
         Viejo, north of Madrid. Today the Sun&rsquo;s magnetic field has already
         been measured. This is an attempt to cross the gap between those two
         facts, and then find out — by looking up — how badly it went.
       </p>
 
-      <p class="hero__lead">
+      <p class="hero__lead" data-es="Una reconstrucción de campo potencial del campo magnético coronal, un modelo de densidad electrónica guiado por la topología, y un renderizador exacto de dispersión Thomson. No es un modelo MHD termodinámico, y no pretende serlo. Cada aproximación está escrita y ordenada por riesgo.">
         A potential-field reconstruction of the coronal magnetic field, a
         topology-informed electron-density model, and an exact Thomson-scattering
         renderer. Not a thermodynamic MHD model, and it does not pretend to be
@@ -410,19 +436,19 @@
       </p>
 
       <ul class="status">
-        <li>Totality in <b id="countdown">&mdash;</b></li>
-        <li>Boundary condition <b>2026-08-11 04:00 UTC</b></li>
-        <li>Ensemble <b>60 members</b></li>
-        <li>Phase <b>B of G</b></li>
+        <li><span data-es="Totalidad en">Totality in</span> <b id="countdown">&mdash;</b></li>
+        <li><span data-es="Condición de contorno">Boundary condition</span> <b>2026-08-11 04:00 UTC</b></li>
+        <li><span data-es="Ensemble">Ensemble</span> <b><span data-es="60 miembros">60 members</span></b></li>
+        <li><span data-es="Fase">Phase</span> <b><span data-es="C de G">C of G</span></b></li>
       </ul>
     </div>
   </div>
 
   <section id="pipeline">
     <div class="wrap prose">
-      <p class="eyebrow">// method</p>
-      <h2>Five stages, each with a stated approximation</h2>
-      <p>
+      <p class="eyebrow" data-es="// método">// method</p>
+      <h2 data-es="Cinco etapas, cada una con su aproximación declarada">Five stages, each with a stated approximation</h2>
+      <p data-es="La corona se ve durante la totalidad porque los electrones libres dispersan la luz fotosférica. Su forma la fija casi por completo el campo magnético. Así que la cadena va de un campo superficial medido a una imagen sintética, y cada eslabón introduce un error que merece nombre.">
         The corona is visible during totality because free electrons scatter
         photospheric light. Its shape is set almost entirely by the magnetic
         field. So the chain runs from a measured surface field to a synthetic
@@ -431,30 +457,30 @@
 
       <ol class="pipe">
         <li><div>
-          <b>Photospheric magnetic field</b>
-          <span>ADAPT-GONG global map, 12 realisations. <em>The far side is modelled, not observed.</em></span>
+          <b data-es="Campo magnético fotosférico">Photospheric magnetic field</b>
+          <span data-es="Mapa global ADAPT-GONG, 12 realizaciones. <em>La cara oculta está modelada, no observada.</em>">ADAPT-GONG global map, 12 realisations. <em>The far side is modelled, not observed.</em></span>
         </div></li>
         <li><div>
-          <b>Coronal field by PFSS</b>
-          <span>Solve &nabla;&sup2;&Phi; = 0 between the surface and a source surface. <em>Current-free, static, and the source surface is fictional.</em></span>
+          <b data-es="Campo coronal por PFSS">Coronal field by PFSS</b>
+          <span data-es="Resolver &nabla;&sup2;&Phi; = 0 entre la superficie y una source surface. <em>Sin corrientes, estático, y la source surface es ficticia.</em>">Solve &nabla;&sup2;&Phi; = 0 between the surface and a source surface. <em>Current-free, static, and the source surface is fictional.</em></span>
         </div></li>
         <li><div>
-          <b>Magnetic topology</b>
-          <span>Trace field lines; open ones become coronal holes, closed ones become streamers. <em>Exact, given the field.</em></span>
+          <b data-es="Topología magnética">Magnetic topology</b>
+          <span data-es="Trazar líneas de campo; las abiertas son agujeros coronales, las cerradas son streamers. <em>Exacto, dado el campo.</em>">Trace field lines; open ones become coronal holes, closed ones become streamers. <em>Exact, given the field.</em></span>
         </div></li>
         <li><div>
-          <b>Electron density</b>
-          <span>An empirical radial profile modulated by topology. <em>A proxy. This is the weakest link and it is labelled as such.</em></span>
+          <b data-es="Densidad electrónica">Electron density</b>
+          <span data-es="Un perfil radial empírico modulado por la topología. <em>Un proxy. Este es el eslabón más débil y está etiquetado como tal.</em>">An empirical radial profile modulated by topology. <em>A proxy. This is the weakest link and it is labelled as such.</em></span>
         </div></li>
         <li><div>
-          <b>Thomson scattering</b>
-          <span>Integrate along every line of sight with the van de Hulst kernel. <em>Genuinely exact: the corona is optically thin, &tau; &asymp; 10&#8315;&#8310;.</em></span>
+          <b data-es="Dispersión Thomson">Thomson scattering</b>
+          <span data-es="Integrar a lo largo de cada línea de visión con el núcleo de van de Hulst. <em>Genuinamente exacto: la corona es ópticamente fina, &tau; &asymp; 10&#8315;&#8310;.</em>">Integrate along every line of sight with the van de Hulst kernel. <em>Genuinely exact: the corona is optically thin, &tau; &asymp; 10&#8315;&#8310;.</em></span>
         </div></li>
       </ol>
 
       <div class="note">
-        <p class="note__title">what this is not</p>
-        <p>
+        <p class="note__title" data-es="lo que esto no es">what this is not</p>
+        <p data-es="&lt;a href=&quot;https://eclipse.predsci.com/&quot;&gt;Predictive Science&lt;/a&gt; ejecuta un modelo MHD dependiente del tiempo para este eclipse, asimilando magnetogramas de la cara oculta de Solar Orbiter/PHI. Van a ser mejores que esto. Ese es justo el motivo de tenerlos como línea base: la pregunta interesante es <em>dónde</em> se rompe un modelo barato, y cuánto.">
           <a href="https://eclipse.predsci.com/">Predictive Science</a> run a
           time-dependent MHD model for this eclipse, assimilating far-side
           magnetograms from Solar Orbiter/PHI. They will be better than this.
@@ -468,16 +494,16 @@
   <section id="phase-a">
     <div class="wrap">
       <div class="prose">
-        <p class="eyebrow">// phase A &mdash; complete</p>
-        <h2>The uncertainty is not where you would guess</h2>
-        <p>
+        <p class="eyebrow" data-es="// fase A &mdash; completada">// phase A &mdash; complete</p>
+        <h2 data-es="La incertidumbre no está donde parece">The uncertainty is not where you would guess</h2>
+        <p data-es="El error dominante de toda esta cadena no es el renderizador, ni siquiera PFSS. Es que <strong>no podemos ver la cara oculta del Sol</strong>. Los mapas globales reconstruyen el hemisferio escondido con un modelo de transporte de flujo superficial, y agosto de 2026 está cerca del máximo solar, cuando las regiones activas evolucionan en días.">
           The dominant error in this whole pipeline is not the renderer and not
           even PFSS. It is that <strong>we cannot see the far side of the
           Sun</strong>. Global maps reconstruct the hidden hemisphere with a
           surface flux-transport model, and August 2026 is near solar maximum,
           when active regions evolve in days.
         </p>
-        <p>
+        <p data-es="ADAPT entrega doce realizaciones de esa reconstrucción. Coinciden casi exactamente en <em>cuánto</em> flujo hay: el flujo total sin signo varía solo un 1,14 %. Discrepan mucho en <em>dónde está</em>, y la discrepancia está organizada por longitud.">
           ADAPT ships twelve realisations of that reconstruction. They agree
           almost exactly on <em>how much</em> flux exists — total unsigned flux
           varies by only 1.14%. They disagree sharply on <em>where it is</em>,
@@ -489,7 +515,7 @@
         <img src="figures/magnetogram.png"
              alt="Three panels: the ADAPT-GONG radial magnetic field, the spread across its twelve realisations, and that spread averaged as a function of Carrington longitude"
              width="1600" height="1500">
-        <figcaption>
+        <figcaption data-es="<strong>La condición de contorno y su propia barra de error.</strong> Panel inferior: la dispersión del ensemble frente a la longitud es, en la práctica, un mapa de hace cuánto se observó por última vez cada parte del Sol.">
           <strong>The boundary condition and its own error bar.</strong>
           Bottom panel: ensemble spread against longitude is effectively a map
           of how long ago each part of the Sun was last observed.
@@ -499,19 +525,19 @@
       <div class="prose">
         <div class="tablewrap">
           <table>
-            <caption>Ensemble spread at totality, when the disk centre sits at Carrington longitude 224.5&deg;</caption>
+            <caption data-es="Dispersión del ensemble en la totalidad, con el centro del disco en longitud carringtoniana 224,5&deg;">Ensemble spread at totality, when the disk centre sits at Carrington longitude 224.5&deg;</caption>
             <thead>
-              <tr><th>Region</th><th class="num">Carrington longitude</th><th class="num">Spread</th></tr>
+              <tr><th data-es="Región">Region</th><th class="num" data-es="Longitud carringtoniana">Carrington longitude</th><th class="num" data-es="Dispersión">Spread</th></tr>
             </thead>
             <tbody>
-              <tr><td>Disk centre</td><td class="num">224.5&deg;</td><td class="num">1.85 G</td></tr>
-              <tr><td>West limb</td><td class="num">314.5&deg;</td><td class="num">4.11 G</td></tr>
-              <tr><td><strong>East limb</strong></td><td class="num">134.5&deg;</td><td class="num"><b>7.71 G</b></td></tr>
+              <tr><td data-es="Centro del disco">Disk centre</td><td class="num">224.5&deg;</td><td class="num">1.85 G</td></tr>
+              <tr><td data-es="Limbo oeste">West limb</td><td class="num">314.5&deg;</td><td class="num">4.11 G</td></tr>
+              <tr><td data-es="<strong>Limbo este</strong>"><strong>East limb</strong></td><td class="num">134.5&deg;</td><td class="num"><b>7.71 G</b></td></tr>
             </tbody>
           </table>
         </div>
 
-        <p>
+        <p data-es="El limbo este es el borde que ha salido más recientemente de la cara oculta, así que lleva más tiempo sin observarse. Arrastra <strong>4,2 veces la incertidumbre del centro del disco</strong>, y en una imagen de eclipse los limbos son justo donde vive la estructura, porque los streamers se ven de canto contra el cielo.">
           The east limb is the edge that most recently rotated out of the far
           side, so it is the longest unobserved. It carries <strong>4.2&times;
           the uncertainty of disk centre</strong> — and on an eclipse image the
@@ -520,8 +546,8 @@
         </p>
 
         <div class="note">
-          <p class="note__title">a pre-registered prediction about our own failure</p>
-          <p>
+          <p class="note__title" data-es="una predicción pre-registrada sobre nuestro propio fallo">a pre-registered prediction about our own failure</p>
+          <p data-es="Si este modelo falla mañana, debería fallar <strong>de forma asimétrica, peor en el limbo este</strong>. Si falla de forma simétrica, el campo de la cara oculta no era el factor limitante y lo es otra cosa: la source surface, o el proxy de densidad. En cualquier caso aprendemos algo, que es más de lo que nos habría dado una imagen segura de sí misma.">
             If this model fails tomorrow, it should fail <strong>asymmetrically,
             worse on the east limb</strong>. If it fails symmetrically, the
             far-side field was not the limiting factor and something else is —
@@ -536,28 +562,28 @@
   <section id="phase-b">
     <div class="wrap">
       <div class="prose">
-        <p class="eyebrow">// phase B &mdash; complete</p>
-        <h2>A parameter nobody has measured</h2>
-        <p>
+        <p class="eyebrow" data-es="// fase B &mdash; completada">// phase B &mdash; complete</p>
+        <h2 data-es="Un parámetro que nadie ha medido">A parameter nobody has measured</h2>
+        <p data-es="PFSS supone que la corona no lleva corrientes, así que el campo es el gradiente de un potencial que satisface la ecuación de Laplace. El contenido físico real del modelo está en su contorno superior: una <em>source surface</em> a radio R<sub>ss</sub> donde el campo se fuerza radial, haciendo de sustituto del viento solar que lo abre.">
           PFSS assumes the corona carries no currents, so the field is the
           gradient of a potential satisfying Laplace&rsquo;s equation. The model&rsquo;s
           real physical content is its upper boundary: a <em>source surface</em>
           at radius R<sub>ss</sub> where the field is forced radial, standing in
           for the solar wind dragging it open.
         </p>
-        <p>
+        <p data-es="Esa superficie no existe. R<sub>ss</sub> = 2,5 R<sub>&#9737;</sub> es una convención de 1969, y trabajos recientes que la contrastan con imágenes de eclipse encuentran que el mejor valor se mueve con el ciclo solar. Así que no elegimos uno: ejecutamos cinco, sobre las doce realizaciones. Sesenta resoluciones, 124 segundos en un portátil.">
           There is no such surface. R<sub>ss</sub> = 2.5 R<sub>&#9737;</sub> is a
           convention from 1969, and recent work benchmarking against eclipse
           images finds the best value moves with the solar cycle. So we do not
           pick one — we run five, across all twelve realisations. Sixty solves,
           124 seconds on a laptop.
         </p>
-        <p>
+        <p data-es="Antes de fiarnos de nada: para un contorno dipolar puro el potencial tiene forma cerrada, y el solver tiene que reproducirla.">
           Before trusting any of it: for a pure dipole boundary the potential
           has a closed form, and the solver must reproduce it.
         </p>
         <pre>Br(r, &theta;) = b&#8320; cos&theta; &middot; (Rss&#8315;&sup3; + 2r&#8315;&sup3;) / (2 + Rss&#8315;&sup3;)</pre>
-        <p>
+        <p data-es="Lo hace, con un 5 % en la source surface y la polaridad en el sentido correcto, y reproduce el mapa de contorno de entrada al 0,03 % RMS. Convenciones de signo, normalización y condición de contorno superior quedan fijadas por ese único test.">
           It does, to 5% at the source surface, with the polarity the right way
           round, and it reproduces the input boundary map to 0.03% RMS. Sign
           conventions, normalisation and the upper boundary condition are all
@@ -569,7 +595,7 @@
         <img src="figures/pfss_ensemble.png"
              alt="Five source-surface radial field maps with their neutral lines, from 1.3 to 3.0 solar radii, plus open flux against source surface radius"
              width="1800" height="2085">
-        <figcaption>
+        <figcaption data-es="<strong>El mismo Sol, cinco source surfaces.</strong> La línea amarilla es la línea neutra: la base de la lámina de corriente heliosférica, donde se asienta la banda de streamers.">
           <strong>The same Sun, five source surfaces.</strong> The yellow line is
           the neutral line — the base of the heliospheric current sheet, where
           the streamer belt sits.
@@ -581,9 +607,9 @@
   <section id="explorer">
     <div class="wrap">
       <div class="prose">
-        <p class="eyebrow">// simulation</p>
-        <h2>Move the source surface yourself</h2>
-        <p>
+        <p class="eyebrow" data-es="// simulación">// simulation</p>
+        <h2 data-es="Mueve tú la source surface">Move the source surface yourself</h2>
+        <p data-es="No son la misma imagen a distintas escalas. Según baja R<sub>ss</sub>, la banda deja de ser una sola y se rompe en varios streamers distintos. Predicen eclipses visiblemente diferentes.">
           These are not the same picture at different scales. As R<sub>ss</sub>
           falls, the belt stops being a single band and breaks into several
           distinct streamers. These predict visibly different eclipses.
@@ -618,35 +644,35 @@
           </figure>
         </div>
 
-        <p class="sim__hint">ADAPT-GONG 2026-08-11T04:00Z &middot; realisation 0 &middot; nr = 100</p>
+        <p class="sim__hint">ADAPT-GONG 2026-08-11T04:00Z &middot; <span data-es="realización 0">realisation 0</span> &middot; nr = 100</p>
       </div>
 
       <div class="prose" style="margin-top:2rem">
-        <h3>Which uncertainty wins, stated carefully</h3>
-        <p>
+        <h3 data-es="Qué incertidumbre gana, dicho con cuidado">Which uncertainty wins, stated carefully</h3>
+        <p data-es="El flujo abierto varía 48 veces más entre las cinco source surfaces que entre las doce realizaciones del contorno. No vamos a liderar con ese número: el flujo abierto se mide <em>en la propia source surface</em>, cuyo radio es el parámetro que se varía, así que parte de ese cociente es definicional y no físico.">
           Open flux varies 48&times; more across the five source surfaces than
           across the twelve boundary realisations. We are not going to lead with
           that number: open flux is measured <em>at the source surface</em>,
           whose radius is the parameter being varied, so part of that ratio is
           definitional rather than physical.
         </p>
-        <p>
+        <p data-es="La métrica honesta es la que enseña de verdad un eclipse: dónde se sitúa la banda de streamers en el cielo.">
           The honest metric is the one an eclipse actually shows — where the
           streamer belt sits on the sky.
         </p>
 
         <div class="tablewrap">
           <table>
-            <caption>RMS scatter in neutral-line latitude</caption>
+            <caption data-es="Dispersión RMS de la latitud de la línea neutra">RMS scatter in neutral-line latitude</caption>
             <tbody>
-              <tr><td>Across 12 ADAPT realisations, fixed R<sub>ss</sub></td><td class="num">5.3&deg;</td></tr>
-              <tr><td>Across 5 source surfaces, fixed realisation</td><td class="num">20.5&deg;</td></tr>
-              <tr><td><strong>Ratio</strong></td><td class="num"><b>3.8&times;</b></td></tr>
+              <tr><td data-es="Entre 12 realizaciones ADAPT, R<sub>ss</sub> fijo">Across 12 ADAPT realisations, fixed R<sub>ss</sub></td><td class="num">5.3&deg;</td></tr>
+              <tr><td data-es="Entre 5 source surfaces, realización fija">Across 5 source surfaces, fixed realisation</td><td class="num">20.5&deg;</td></tr>
+              <tr><td data-es="<strong>Cociente</strong>"><strong>Ratio</strong></td><td class="num"><b>3.8&times;</b></td></tr>
             </tbody>
           </table>
         </div>
 
-        <p>
+        <p data-es="Así que el orden se mantiene, con la magnitud corregida. La elección de source surface mueve la banda de streamers unas <strong>cuatro veces</strong> más que toda la incertidumbre de la cara oculta, no cincuenta. Las dos importan; el parámetro ficticio importa más.">
           So the ranking survives with a corrected magnitude. The source-surface
           choice moves the streamer belt about <strong>four times</strong> as
           much as the entire far-side uncertainty — not fifty. Both matter; the
@@ -656,25 +682,95 @@
     </div>
   </section>
 
+  <section id="phase-c">
+    <div class="wrap">
+      <div class="prose">
+        <p class="eyebrow" data-es="// fase C &mdash; completada">// phase C &mdash; complete</p>
+        <h2 data-es="Dónde escapa el viento, y dónde queda atrapado el plasma">Where the wind escapes, and where plasma stays trapped</h2>
+        <p data-es="Con el campo resuelto, se integran líneas de campo desde 16 200 semillas fotosféricas repartidas en área igual y se clasifican. Las líneas <strong>cerradas</strong> vuelven a la superficie por los dos extremos: atrapan plasma, son sobredensas y construyen los streamers. Las <strong>abiertas</strong> alcanzan la source surface: el plasma escapa como viento solar, la región es subdensa y forma un agujero coronal, oscuro en luz blanca.">
+          With the field solved, field lines are integrated from 16,200
+          equal-area photospheric seeds and classified. <strong>Closed</strong>
+          lines return to the surface at both ends: they trap plasma, are
+          overdense, and build the streamers. <strong>Open</strong> lines reach
+          the source surface: plasma escapes as solar wind, the region is
+          underdense, and it forms a coronal hole — dark in white light.
+        </p>
+        <p data-es="Esa clasificación es lo que convierte un campo magnético en algo sobre lo que se puede poner una densidad, así que alimenta directamente a la Fase D.">
+          That classification is what turns a magnetic field into something we
+          can put a density on, so it feeds directly into Phase D.
+        </p>
+      </div>
+
+      <figure>
+        <img src="figures/topology.png"
+             alt="Map of open magnetic field at the photosphere showing coronal holes by polarity, and open surface area against source surface radius"
+             width="1650" height="1260">
+        <figcaption data-es="<strong>Agujeros coronales y cuánto del Sol está abierto.</strong> Un agujero polar sur grande y positivo se extiende hasta el ecuador cerca de la longitud 250&deg;, muy cerca del centro del disco en la totalidad.">
+          <strong>Coronal holes, and how much of the Sun is open.</strong> A
+          large positive south-polar hole extends to the equator near longitude
+          250&deg;, close to disk centre at totality.
+        </figcaption>
+      </figure>
+
+      <div class="prose">
+        <p data-es="La clasificación está convergida: al doblar el presupuesto de pasos de integración, <strong>cero</strong> semillas cambian de clase. Importa, porque una línea que se queda sin pasos a mitad de vuelo es indistinguible de una que escapó.">
+          The classification is converged: doubling the integration step budget
+          changes <strong>zero</strong> seeds. That matters, because a line that
+          exhausts its budget mid-flight is indistinguishable from one that
+          escaped.
+        </p>
+
+        <div class="tablewrap">
+          <table>
+            <caption data-es="Superficie solar abierta, media del ensemble de 12 realizaciones">Open solar surface area, mean over the 12-realisation ensemble</caption>
+            <thead>
+              <tr><th>R<sub>ss</sub></th><th class="num" data-es="Área abierta">Open area</th><th class="num" data-es="Dispersión del contorno">Boundary spread</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>1.3 R<sub>&#9737;</sub></td><td class="num">30.69%</td><td class="num">1.64 pp</td></tr>
+              <tr><td>1.5 R<sub>&#9737;</sub></td><td class="num">20.43%</td><td class="num">1.10 pp</td></tr>
+              <tr><td>2.0 R<sub>&#9737;</sub></td><td class="num">11.26%</td><td class="num">0.72 pp</td></tr>
+              <tr><td>2.5 R<sub>&#9737;</sub></td><td class="num"><b>7.74%</b></td><td class="num">0.70 pp</td></tr>
+              <tr><td>3.0 R<sub>&#9737;</sub></td><td class="num">5.99%</td><td class="num">0.56 pp</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="note">
+          <p class="note__title" data-es="este cociente sí es limpio">this ratio is a clean one</p>
+          <p data-es="El área abierta cambia <strong>26 veces</strong> más entre source surfaces (24,7 puntos porcentuales) que entre realizaciones del contorno (0,94 pp). A diferencia del flujo abierto, aquí no hay nada definicional: el área abierta se mide siempre en la <em>fotosfera</em>, un radio fijo, mientras que el parámetro que se varía vive muy por encima. Elegir R<sub>ss</sub> = 2,5 en vez de 1,5 cambia la superficie solar que está abierta de un 20 % a un 8 %.">
+            Open area varies <strong>26&times;</strong> more across source
+            surfaces (24.7 percentage points) than across boundary realisations
+            (0.94 pp). Unlike open flux, nothing here is definitional: open area
+            is always measured at the <em>photosphere</em>, a fixed radius, while
+            the parameter being varied lives far above it. Choosing
+            R<sub>ss</sub> = 2.5 instead of 1.5 changes how much of the Sun is
+            open from 20% to 8%.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section id="next">
     <div class="wrap prose">
-      <p class="eyebrow">// what is left</p>
-      <h2>Between here and totality</h2>
-      <p>
-        Field-line topology, the electron-density proxy, and then the part that
-        is actually ours to write: the Thomson-scattering renderer. A 1024&sup2;
-        image at 512 samples per ray is about 5&times;10&#8312; independent kernel
-        evaluations with no coupling between them, which is the one place in
-        this pipeline where a GPU is obviously the right tool.
+      <p class="eyebrow" data-es="// lo que queda">// what is left</p>
+      <h2 data-es="De aquí a la totalidad">Between here and totality</h2>
+      <p data-es="El proxy de densidad electrónica, y después la parte que de verdad nos toca escribir: el renderizador de dispersión Thomson. Una imagen de 1024&sup2; con 512 muestras por rayo son unas 5&times;10&#8312; evaluaciones independientes del núcleo, sin acoplamiento entre ellas — el único punto de esta cadena donde una GPU es obviamente la herramienta correcta.">
+        The electron-density proxy, and then the part that is actually ours to
+        write: the Thomson-scattering renderer. A 1024&sup2; image at 512 samples
+        per ray is about 5&times;10&#8312; independent kernel evaluations with no
+        coupling between them, which is the one place in this pipeline where a
+        GPU is obviously the right tool.
       </p>
-      <p>
+      <p data-es="Luego la comparación contra Predictive Science y, el 13 de agosto, la única comparación que cuenta de verdad.">
         Then the comparison against Predictive Science, and on 13 August the
         only comparison that really counts.
       </p>
 
       <div class="note">
-        <p class="note__title">the rule this project runs on</p>
-        <p>
+        <p class="note__title" data-es="la regla con la que funciona este proyecto">the rule this project runs on</p>
+        <p data-es="La predicción y el magnetograma del que sale se commitean y se suben <strong>antes de la totalidad</strong>, con la hora de observación de entrada registrada. El historial de git es la prueba. Una predicción publicada después no es una predicción.">
           The prediction and the magnetogram it came from are committed and
           pushed <strong>before totality</strong>, with the input observation
           time recorded. The git history is the evidence. A prediction published
@@ -682,7 +778,7 @@
         </p>
       </div>
 
-      <p>
+      <p data-es="Tener éxito aquí no significa que la corona coincida. Significa que la cadena funciona, que las figuras existen y que las aproximaciones están declaradas con honestidad. Si coincide, es un resultado; si no, averiguar por qué es un resultado mejor. El modo de fallo no es una predicción equivocada: es no tener predicción.">
         Success here does not mean the corona matches. It means the pipeline
         runs, the figures exist, and the approximations are stated honestly. If
         it matches, that is a result; if it does not, working out why is a
@@ -696,13 +792,13 @@
 
 <footer>
   <div class="wrap prose">
-    <p>
+    <p data-es="Hecho por <a href=&quot;https://github.com/FullFran&quot;>Fran Olmedo</a> &mdash; <a href=&quot;https://github.com/FullFran/corona26&quot;>código y desarrollo completo en GitHub</a>. Proyecto hermano: <a href=&quot;https://github.com/FullFran/snow-mcrt&quot;>snow-mcrt</a>, la misma física de dispersión en el extremo opuesto de profundidad óptica.">
       Built by <a href="https://github.com/FullFran">Fran Olmedo</a> &mdash;
       <a href="https://github.com/FullFran/corona26">source and full write-up on GitHub</a>.
       Sibling project: <a href="https://github.com/FullFran/snow-mcrt">snow-mcrt</a>,
       the same scattering physics at the opposite optical depth.
     </p>
-    <p>
+    <p data-es="Datos de magnetograma: <a href=&quot;https://nso.edu/data/nisp-data/adapt-maps/&quot;>ADAPT</a> / GONG, National Solar Observatory. PFSS resuelto con <a href=&quot;https://docs.sunpy.org/projects/sunkit-magex/en/latest/&quot;>sunkit-magex</a>. Dispersión Thomson según van de Hulst (1950) y Billings (1966).">
       Magnetogram data: <a href="https://nso.edu/data/nisp-data/adapt-maps/">ADAPT</a> / GONG,
       National Solar Observatory. PFSS solved with
       <a href="https://docs.sunpy.org/projects/sunkit-magex/en/latest/">sunkit-magex</a>.
@@ -737,6 +833,53 @@
       b.setAttribute('aria-pressed', String(b === btn));
     });
   });
+
+  // ---- language toggle -------------------------------------------------
+  // English is authored inline so the page is fully readable with no JS and
+  // to search engines. Spanish lives in data-es. On first switch the English
+  // is captured into data-en, so switching back is lossless.
+  (function () {
+    var STORE = 'corona26:lang';
+
+    function nodes(root) {
+      return (root || document).querySelectorAll('[data-es]');
+    }
+
+    function apply(lang, root) {
+      nodes(root).forEach(function (el) {
+        if (!el.hasAttribute('data-en')) {
+          el.setAttribute('data-en', el.innerHTML);
+        }
+        el.innerHTML = el.getAttribute(lang === 'es' ? 'data-es' : 'data-en');
+      });
+      document.documentElement.lang = lang;
+      document.querySelectorAll('.lang button').forEach(function (b) {
+        b.setAttribute('aria-pressed', String(b.dataset.lang === lang));
+      });
+    }
+
+    function current() {
+      return document.documentElement.lang === 'es' ? 'es' : 'en';
+    }
+
+    var stored = null;
+    try { stored = localStorage.getItem(STORE); } catch (e) { /* private mode */ }
+    var initial = stored || ((navigator.language || 'en').slice(0, 2) === 'es' ? 'es' : 'en');
+    if (initial === 'es') apply('es');
+
+    document.addEventListener('click', function (e) {
+      var btn = e.target.closest('.lang button');
+      if (!btn) return;
+      var lang = btn.dataset.lang;
+      apply(lang);
+      try { localStorage.setItem(STORE, lang); } catch (e) { /* ignore */ }
+    });
+
+    // htmx swaps in fresh English markup; re-translate just that subtree.
+    document.body.addEventListener('htmx:afterSwap', function (e) {
+      if (current() === 'es') apply('es', e.target);
+    });
+  })();
 </script>
 
 </body>
