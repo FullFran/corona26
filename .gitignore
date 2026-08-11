@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Solar data — large FITS, refetched from NSO/JSOC, never committed
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+
+# Rendered output — figures promoted to docs/figures/ are committed
+outputs/*
+!outputs/.gitkeep
+
+# Local
+.DS_Store
+.atl/
+scratchpad/

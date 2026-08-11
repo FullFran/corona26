@@ -1,0 +1,14 @@
+[project]
+name = "corona26"
+version = "0.1.0"
+description = "Predicting the 2026 solar eclipse corona from real magnetic-field data"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "astropy>=8.0.1",
+    "matplotlib>=3.11.1",
+    "numpy>=2.5.2",
+    "scipy>=1.18.0",
+    "sunkit-magex>=1.1.0",
+    "sunpy[map,net]>=8.0.0",
+]
