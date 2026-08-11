@@ -4,8 +4,7 @@ Predicting the corona of the 12 August 2026 total solar eclipse from real
 photospheric magnetic-field data — PFSS reconstruction, a topology-informed
 electron-density proxy, and an exact Thomson-scattering renderer.
 
-> **Status: planning complete, implementation starting.**
-> No results yet. Every figure referenced below is a commitment, not a claim.
+> **Status: Phase A complete — boundary condition acquired and characterised.**
 > Written 11 August 2026, the day before totality.
 
 ## The question
@@ -68,7 +67,7 @@ density profile.
 They will be better than us. That is the point of having them as a baseline.
 The interesting question is *where* the cheap model breaks and by how much.
 
-## The uncomfortable part, stated in advance
+## The uncomfortable part, measured in advance
 
 The dominant error is not the renderer and it is not even PFSS. **It is that
 we cannot see the far side of the Sun.**
@@ -81,8 +80,48 @@ fixes it.
 
 So we do not publish one image. ADAPT ships **12 realisations** of the boundary
 condition; we run **5 source-surface radii**. That is a 60-member ensemble, and
-its spread is the error bar. A streamer that survives all 60 members is a
-prediction. One that appears in three is noise.
+its spread is the error bar.
+
+![ADAPT-GONG boundary condition and its ensemble spread](docs/figures/magnetogram.png)
+
+**Boundary condition in hand** — ADAPT-GONG, observed **2026-08-11 04:00 UTC**,
+1° × 1° global grid, 12 realisations, central meridian at Carrington longitude
+245.8°. It is well-behaved where it should be: the residual monopole is
+`|∮Br dA| / ∮|Br| dA = 0.03%`, and total unsigned flux varies by only **1.14%**
+across the twelve realisations.
+
+That last number is misleading on its own, and the middle panel is why.
+
+### Phase A found something the plan did not anticipate
+
+The realisations agree almost exactly on *how much* flux there is. They
+disagree sharply on *where it is* — and the disagreement is not uniform. It is
+organised by longitude, and the organisation is a straight readout of **how
+long ago each part of the Sun was last observed**:
+
+| At totality (`L0 = 224.5°`) | Carrington longitude | Ensemble spread |
+|---|---|---|
+| Disk centre | 224.5° | **1.85 G** |
+| West limb | 314.5° | 4.11 G |
+| **East limb** | **134.5°** | **7.71 G** |
+
+The Carrington longitude of the central meridian *decreases* with time, so
+material arrives at disk centre from lower longitudes. The east limb is the
+edge that most recently rotated out of the far side — the longest unobserved,
+the most extrapolated.
+
+**It carries 4.2× the boundary uncertainty of disk centre.** And on an eclipse
+image the limbs are exactly where the plane-of-sky structure lives: streamers
+are seen edge-on, against the sky, at the limbs. The one part of the corona we
+will actually be looking at is anchored in the worst-constrained part of the
+input.
+
+This is a falsifiable, pre-registered prediction about our own failure mode:
+**if this model fails tomorrow, it should fail asymmetrically, worse on the
+east limb.** If it fails symmetrically, the far-side field was not the problem
+and something else is — the source surface, or the density proxy.
+
+That is a better thing to have before an experiment than a confident picture.
 
 ## Where the compute goes
 
