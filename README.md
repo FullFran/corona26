@@ -7,7 +7,7 @@ electron-density proxy, and an exact Thomson-scattering renderer.
 > **Status: Phases A and B complete — boundary condition and 60-member PFSS
 > ensemble solved and validated.** Written 11 August 2026, the day before totality.
 >
-> Live write-up: **[fullfran.github.io/corona26](https://fullfran.github.io/corona26/)**
+> Live write-up: **[www.fullfran.com/corona26](https://www.fullfran.com/corona26/)**
 
 ## The question
 
