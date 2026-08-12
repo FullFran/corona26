@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "locked_at": "2026-08-12T17:46:14+02:00",
+  "protocol": {
+    "path": "docs/validation-protocol.md",
+    "sha256": "c24940ba4dec0591874dcf50296cdf1cda8101340cb4075a9a1b5ae58fcca9a8"
+  },
+  "prediction_manifest": {
+    "path": "docs/manifests/frozen-prediction.json",
+    "sha256": "e92d7df5f495cdd6b652d24db045d1777c625c588ecb476329e95125df714112"
+  },
+  "statement": "La predicción es anterior al eclipse; este protocolo de puntuación se ha cerrado en la fecha indicada y no se presenta como previo al eclipse."
+}

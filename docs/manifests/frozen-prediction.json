@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "artifact": {
+    "repository_path": "docs/figures/corona_channels.png",
+    "sha256": "e71d6543723cb44eeea5bfa249e4aa19bbb3c69374c52135f8f483cdcc27d787"
+  },
+  "git_commit": "59d3890526b33b8c1d4281777a3144ae78644f99",
+  "selector": "first-panel",
+  "crop": {
+    "bounds_px": [51, 155, 840, 944],
+    "coordinate_order": "left_top_right_bottom",
+    "result_size_px": [789, 789]
+  },
+  "geometry": {
+    "center_x_px": 394.0,
+    "center_y_px": 394.0,
+    "solar_radius_px": 140.89285714285714,
+    "field_of_view_half_width_rsun": 2.8,
+    "orientation": "solar_north_up",
+    "astronomical_east": "image_left"
+  },
+  "transformation": "explicit_crop_only",
+  "display_note": "Predicción oficial sobre el render mostrado; los rerenders posteriores son exploratorios."
+}

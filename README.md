@@ -4,7 +4,7 @@ Predicting the corona of the 12 August 2026 total solar eclipse from real
 photospheric magnetic-field data — PFSS reconstruction, a topology-informed
 electron-density proxy, and an exact Thomson-scattering renderer.
 
-> **Status: Phases A–E complete. There is a prediction.**
+> **Status: Phases A–E complete. There is a frozen prediction; post-eclipse validation is prepared but has not been run.**
 > Written 11 August 2026, the day before totality.
 >
 > Live write-up: **[www.fullfran.com/corona26](https://www.fullfran.com/corona26/)**
@@ -338,6 +338,12 @@ has to be picked against a horizon profile, not a map.
 
 ## Validation
 
+The scoring procedure is now locked in
+[`docs/validation-protocol.md`](docs/validation-protocol.md). No primary eclipse
+observation has been selected or scored yet. The prediction predates the
+eclipse; the scoring protocol was written on 12 August and is not represented
+as a pre-eclipse preregistration.
+
 Three baselines, in increasing order of severity:
 
 1. **Predictive Science / MAS** — the professional MHD prediction, which
@@ -379,6 +385,7 @@ better one. The failure mode is not a wrong prediction. It is no prediction.
 | [`docs/scope.md`](docs/scope.md) | What V1 does and explicitly does not do |
 | [`docs/architecture.md`](docs/architecture.md) | Pipeline design and the seven decisions behind it |
 | [`docs/plan.md`](docs/plan.md) | Phases, fallbacks, and the hour-by-hour run to totality |
+| [`docs/validation-protocol.md`](docs/validation-protocol.md) | Locked post-eclipse scoring protocol and provenance rules |
 | [`docs/bib/references.md`](docs/bib/references.md) | Sources, from Minnaert 1930 to Rice 2026 |
 
 ## Running it
