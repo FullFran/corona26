@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>corona26 — predicting the 2026 eclipse corona from real magnetic-field data</title>
 <meta name="description" content="A PFSS reconstruction and Thomson-scattering renderer that predicts the solar corona of the 12 August 2026 total eclipse; post-eclipse validation is prepared but not yet run.">
-<meta property="og:title" content="corona26 — can I predict tomorrow's solar corona from today's magnetic field?">
+<meta property="og:title" content="corona26 — predicting the 2026 eclipse corona from a real magnetic field">
 <meta property="og:description" content="Real magnetogram to PFSS ensemble to Thomson scattering. Timestamped before totality, graded by the Sun.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://fullfran.github.io/corona26/">
@@ -43,7 +43,7 @@
 
   *, *::before, *::after { box-sizing: border-box; }
 
-  html { -webkit-text-size-adjust: 100%; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
 
   body {
     margin: 0;
@@ -190,6 +190,82 @@
 
   section { padding: 3.5rem 0; border-bottom: 1px solid var(--border); }
   section:last-of-type { border-bottom: 0; }
+  [id] { scroll-margin-top: 7.5rem; }
+
+  .tabs-nav {
+    position: sticky;
+    top: 3.5rem;
+    z-index: 15;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+  .tabs-nav__list {
+    display: flex;
+    gap: 0.35rem;
+    margin: 0;
+    padding: 0.65rem 0;
+    list-style: none;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+  .tabs-nav a {
+    min-height: 44px;
+    padding: 0.55rem 0.8rem;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+    color: var(--fg-muted);
+    border: 1px solid transparent;
+    border-radius: var(--radius-control);
+    text-decoration: none;
+    font-family: var(--mono);
+    font-size: var(--s-135);
+  }
+  .tabs-nav a:hover { color: var(--fg); border-color: var(--border); }
+  .tabs-nav a[aria-selected="true"] {
+    color: var(--accent);
+    border-color: var(--accent-quiet);
+    background: var(--bg-elevated);
+  }
+  .tabs-nav a[aria-selected="true"]::before {
+    content: "●";
+    margin-right: 0.45rem;
+    font-size: 0.65em;
+  }
+  .tabs-enhanced .tab-panel[hidden] { display: none; }
+
+  .guide-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+  .guide-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-panel);
+    background: var(--bg-elevated);
+    padding: 1.15rem 1.25rem;
+  }
+  .guide-card h3 { margin-bottom: 0.65rem; }
+  .guide-card p:last-child, .guide-card ul:last-child, .guide-card ol:last-child { margin-bottom: 0; }
+  .guide-card ul, .guide-card ol { margin: 0 0 1rem; padding-left: 1.25rem; }
+  .guide-card li + li { margin-top: 0.4rem; }
+  .safety {
+    border: 2px solid var(--accent);
+    border-radius: var(--radius-panel);
+    background: var(--bg-elevated);
+    padding: 1.25rem 1.35rem;
+    margin: 1.5rem 0;
+    max-width: 72ch;
+  }
+  .safety h3 { color: var(--accent); margin-bottom: 0.65rem; }
+  .safety p:last-child { margin-bottom: 0; }
+  .timeline {
+    margin: 1rem 0 1.5rem;
+    padding-left: 1.35rem;
+  }
+  .timeline li + li { margin-top: 0.55rem; }
+  .sources li + li { margin-top: 0.35rem; }
 
   .eyebrow {
     font-family: var(--mono);
@@ -235,6 +311,7 @@
   .status b { color: var(--accent); font-weight: 600; }
 
   #countdown { font-variant-numeric: tabular-nums; }
+  .countdown-warning { margin-top: 0.65rem; }
 
   /* ---------- pipeline ---------- */
 
@@ -341,6 +418,9 @@
     padding: 0.5rem 0.8rem;
     min-height: 44px;
     cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
     transition: color 150ms ease-out, border-color 150ms ease-out, background-color 150ms ease-out;
   }
   .sim__btn:hover { color: var(--fg); border-color: var(--border-strong); }
@@ -387,13 +467,24 @@
     section { padding: 2.5rem 0; }
     .hero { padding: 2.75rem 0 2.5rem; }
     .pipe li { grid-template-columns: 1.75rem 1fr; gap: 0.7rem; }
+    .guide-grid { grid-template-columns: 1fr; }
+    .bar__link { display: none; }
   }
 
   @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
     *, *::before, *::after {
       transition-duration: 0ms !important;
       animation-duration: 0ms !important;
     }
+  }
+
+  @media print {
+    .bar, .tabs-nav, .skip { display: none !important; }
+    .tab-panel[hidden] { display: block !important; }
+    body { background: #fff; color: #111; }
+    section { break-inside: avoid; }
+    a { color: #111; }
   }
 </style>
 </head>
@@ -405,6 +496,7 @@
   <div class="bar__in">
     <a class="brand" href="#top">corona<span>26</span></a>
     <div class="bar__spacer"></div>
+    <a class="bar__link" href="#field-guide" data-es="Guía">Guide</a>
     <a class="bar__link" href="#pipeline" data-es="Método">Method</a>
     <a class="bar__link" href="#prediction" data-es="Predicción">Prediction</a>
     <a class="bar__link" href="#explorer" data-es="Simulación">Simulation</a>
@@ -420,7 +512,7 @@
 
   <div class="hero" id="top">
     <div class="wrap prose">
-      <h1 data-es="¿Puedo predecir la corona solar de mañana con el campo magnético de hoy?">Can I predict tomorrow&rsquo;s solar corona from today&rsquo;s magnetic field?</h1>
+      <h1 data-es="¿Puedo predecir la corona de un eclipse con un campo magnético real?">Can I predict an eclipse corona from a real magnetic field?</h1>
 
       <p class="hero__q" data-es="El 12 de agosto de 2026 la Luna tapa el Sol durante 37 segundos sobre Colmenar Viejo, al norte de Madrid. El campo magnético del Sol ya está medido hoy. Esto es un intento de cruzar la distancia entre esos dos hechos y averiguar después, mirando hacia arriba, cómo de mal ha salido.">
         On 12 August 2026 the Moon removes the Sun for 37 seconds over Colmenar
@@ -442,8 +534,150 @@
         <li><span data-es="Ensemble">Ensemble</span> <b><span data-es="60 miembros">60 members</span></b></li>
         <li><span data-es="Fase">Phase</span> <b><span data-es="E de G">E of G</span></b></li>
       </ul>
+      <p class="sim__hint countdown-warning" data-es="Cuenta atrás orientativa hasta C2. NO autoriza a quitarse las gafas: manda la señal física, y solo se retiran cuando haya desaparecido TODA la fotosfera.">
+        Approximate countdown to C2. It does NOT authorise removing solar viewers:
+        the physical signal takes priority, and viewers come off only after ALL of
+        the photosphere has disappeared.
+      </p>
     </div>
   </div>
+
+  <nav class="tabs-nav" aria-label="Main sections / Secciones principales">
+    <div class="wrap">
+      <ul class="tabs-nav__list" aria-label="Page sections" data-es="Secciones de la página">
+        <li><a id="tab-guide" href="#field-guide" data-panel="panel-guide" data-es="Guía">Guide</a></li>
+        <li><a id="tab-prediction" href="#prediction" data-panel="panel-prediction" data-es="Predicción">Prediction</a></li>
+        <li><a id="tab-method" href="#pipeline" data-panel="panel-method" data-es="Método">Method</a></li>
+        <li><a id="tab-simulation" href="#explorer" data-panel="panel-simulation" data-es="Simulación">Simulation</a></li>
+        <li><a id="tab-validation" href="#next" data-panel="panel-validation" data-es="Validación">Validation</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="tab-panel" id="panel-guide" data-tab-panel>
+  <section id="field-guide">
+    <div class="wrap">
+      <div class="prose">
+        <p class="eyebrow" data-es="// guía de observación">// field guide</p>
+        <h2 data-es="Guía rápida para Colmenar Viejo">A practical guide for Colmenar Viejo</h2>
+        <p data-es="El Sol estará muy bajo: 7,4&deg; de altura y acimut 283,2&deg;, hacia el oeste-noroeste (ONO). Un horizonte despejado importa más que ganar unos metros de proximidad: edificios, árboles y la sierra de Guadarrama pueden ocultar la totalidad.">
+          The Sun will be very low: 7.4&deg; altitude at azimuth 283.2&deg;, toward
+          west-northwest (WNW). A clear horizon matters more than gaining a few
+          metres of proximity: buildings, trees and the Guadarrama range can hide totality.
+        </p>
+      </div>
+
+      <div class="safety" role="note" aria-labelledby="safety-title">
+        <h3 id="safety-title" data-es="Seguridad ocular: no improvises">Eye safety: do not improvise</h3>
+        <p data-es="Usa visores solares fiables que cumplan ISO 12312-2 durante <strong>toda la parcialidad</strong>. Retíralos únicamente cuando haya desaparecido <strong>TODA la fotosfera</strong>; vuelve a colocarlos en cuanto aparezca el primer punto brillante y, si tienes cualquier duda, antes de C3. Las gafas comunes y los filtros caseros no sirven.">
+          Use trustworthy ISO 12312-2 solar viewers throughout <strong>every partial phase</strong>.
+          Remove them only after <strong>ALL of the photosphere</strong> has disappeared;
+          replace them as soon as the first bright point appears and, if in any doubt,
+          before C3. Ordinary sunglasses and homemade filters are not safe.
+        </p>
+        <p data-es="Cámaras, prismáticos y telescopios necesitan un filtro solar específico firmemente sujeto <strong>delante del objetivo</strong>. Mirar con gafas de eclipse detrás de una óptica concentradora es peligroso. Si estás improvisando, no manipules óptica aumentadora durante las transiciones: observa a simple vista con el visor adecuado.">
+          Cameras, binoculars and telescopes need a purpose-made solar filter secured
+          <strong>in front of the objective</strong>. Eclipse glasses behind concentrating
+          optics are dangerous. If you are improvising, do not handle magnifying optics
+          during transitions: observe unaided with the correct viewer.
+        </p>
+      </div>
+
+      <div class="guide-grid">
+        <article class="guide-card">
+          <h3 data-es="Horario local (CEST)">Local timetable (CEST)</h3>
+          <div class="tablewrap">
+            <table>
+              <caption data-es="Circunstancias OAN/IGN para Colmenar Viejo">OAN/IGN circumstances for Colmenar Viejo</caption>
+              <tbody>
+                <tr><th scope="row" data-es="Primer contacto (C1)">First contact (C1)</th><td class="num">19:36:24</td></tr>
+                <tr><th scope="row" data-es="Inicio de totalidad (C2)">Totality begins (C2)</th><td class="num">20:31:42</td></tr>
+                <tr><th scope="row" data-es="Máximo">Maximum</th><td class="num">20:32:00</td></tr>
+                <tr><th scope="row" data-es="Fin de totalidad (C3)">Totality ends (C3)</th><td class="num">20:32:24</td></tr>
+                <tr><th scope="row" data-es="Puesta de Sol">Sunset</th><td class="num">21:17:06</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p data-es="La totalidad dura aproximadamente <strong>37&ndash;42 segundos</strong> según el punto exacto y el modelo de cálculo. No es una duración universal para todo Colmenar Viejo y el reloj no sustituye a comprobar que la fotosfera ha desaparecido.">
+            Totality lasts about <strong>37&ndash;42 seconds</strong>, depending on the exact
+            location and calculation model. It is not universal across Colmenar Viejo,
+            and a clock never replaces checking that the photosphere has disappeared.
+          </p>
+        </article>
+
+        <article class="guide-card">
+          <h3 data-es="Antes de salir">Before leaving</h3>
+          <ul>
+            <li data-es="Comprueba una vista despejada hacia 283&deg; ONO y llega con tiempo.">Check for a clear view toward 283&deg; WNW and arrive early.</li>
+            <li data-es="Inspecciona las gafas; descarta las rayadas, perforadas o dañadas.">Inspect viewers; discard scratched, punctured or damaged ones.</li>
+            <li data-es="Lleva agua, batería cargada y una ubicación segura lejos del tráfico.">Bring water, a charged battery and a safe location away from traffic.</li>
+            <li data-es="Sujeta bien cualquier filtro delante del objetivo antes de apuntar al Sol.">Secure every objective filter before pointing equipment at the Sun.</li>
+            <li data-es="Evita hierba seca y cualquier fuente de calor o riesgo de incendio.">Avoid dry grass and any heat source or fire risk.</li>
+          </ul>
+        </article>
+
+        <article class="guide-card">
+          <h3 data-es="Guion para 37&ndash;42 segundos">A 37&ndash;42 second script</h3>
+          <ol class="timeline">
+            <li data-es="Prepara y empieza a grabar antes de C2. Concepto &gt; móvil: no pases la totalidad configurando una cámara.">Prepare and start recording before C2. Experience &gt; phone: do not spend totality configuring a camera.</li>
+            <li data-es="Primeros segundos: busca la cromosfera, las prominencias rojizas y la corona interna.">First seconds: notice the chromosphere, red prominences and inner corona.</li>
+            <li data-es="En el centro: mira la forma global de la corona y después el paisaje y el horizonte.">Middle: take in the corona's overall shape, then the landscape and horizon.</li>
+            <li data-es="Últimos 8&ndash;10 s: gafas en la mano; póntelas antes de C3 si tienes cualquier duda.">Last 8&ndash;10 s: viewers in hand; put them on before C3 if there is any doubt.</li>
+          </ol>
+        </article>
+
+        <article class="guide-card">
+          <h3 data-es="Si hay nubes">If there are clouds</h3>
+          <p data-es="Mantén las gafas durante toda la parcialidad y observa la luz ambiente, la temperatura, el horizonte y el comportamiento animal. Una nube <strong>nunca</strong> es un filtro solar, aunque el Sol parezca tenue.">
+            Keep viewers on throughout partial phases and observe ambient light,
+            temperature, the horizon and animal behaviour. A cloud is <strong>never</strong>
+            a solar filter, even when the Sun looks dim.
+          </p>
+        </article>
+      </div>
+
+      <div class="prose">
+        <h3 data-es="Qué buscar y por qué ocurre">What to notice, and why it happens</h3>
+        <p data-es="Durante la parcialidad, los huecos entre hojas actúan como cámaras estenopeicas y proyectan crecientes; las sombras se afilan, la iluminación pierde saturación y puede parecer metálica. Cerca de la totalidad quizá aparezcan bandas de sombra: patrones móviles producidos por turbulencia atmosférica, sutiles y no garantizados.">
+          During partial phases, gaps between leaves act as pinhole cameras and project
+          crescents; shadows sharpen and the light loses saturation, sometimes appearing
+          metallic. Near totality, shadow bands may appear: moving patterns produced by
+          atmospheric turbulence, subtle and not guaranteed.
+        </p>
+        <p data-es="En los contactos, los valles lunares dejan pasar puntos de fotosfera: son las perlas de Baily. El último o primer punto brillante junto a la corona forma el anillo de diamante. La cromosfera y las prominencias se ven rojas por la intensa emisión de hidrógeno; el disco lunar parece negro porque su cara nocturna bloquea una fotosfera muchísimo más brillante.">
+          At the contacts, lunar valleys pass points of photospheric light: Baily's beads.
+          The last or first bright point beside the corona forms the diamond ring. The
+          chromosphere and prominences look red because of strong hydrogen emission; the
+          lunar disk looks black because its night side blocks a vastly brighter photosphere.
+        </p>
+        <p data-es="La corona parece blanca porque electrones libres dispersan la mezcla completa de luz fotosférica mediante dispersión Thomson, sin seleccionar un color visible dominante. El cielo no se vuelve una noche total: fuera de la estrecha umbra, la atmósfera y el horizonte periférico siguen iluminados y forman un crepúsculo de 360&deg;. Puede verse acercarse o alejarse la umbra sobre el paisaje.">
+          The corona looks white because free electrons Thomson-scatter the full mixture
+          of photospheric light without selecting one dominant visible colour. The sky
+          does not become full night: outside the narrow umbra, the atmosphere and
+          peripheral horizon remain illuminated, producing 360&deg; twilight. The umbra may
+          be visible approaching or departing across the landscape.
+        </p>
+        <p data-es="A solo 7,4&deg;, la luz atraviesa mucha más atmósfera: aerosoles, humedad y calima aumentan la extinción y reducen contraste y color, por eso el horizonte ONO es crítico. Venus es plausible, pero no sacrifiques la corona buscándolo. El descenso térmico, el viento y las respuestas animales varían mucho y pueden confundirse con el atardecer; son observaciones interesantes, no garantías.">
+          At only 7.4&deg;, light crosses much more atmosphere: aerosols, humidity and haze
+          increase extinction and reduce contrast and colour, making the WNW horizon
+          critical. Venus is plausible, but do not sacrifice the corona searching for it.
+          Cooling, wind and animal responses vary greatly and may be confused with sunset;
+          they are worthwhile observations, not guarantees.
+        </p>
+
+        <h3 data-es="Fuentes oficiales y de seguridad">Official and safety sources</h3>
+        <ul class="sources">
+          <li><a href="https://eclipses.ign.es/src/img/eclipse-26/infografia/28045_Colmenar_Viejo_Madrid.jpg">IGN/OAN: Colmenar Viejo infographic</a> · <a href="https://visualizadores.ign.es/eclipses/2026" data-es="visualizador del eclipse">eclipse viewer</a> · <a href="https://eclipses.ign.es/condiciones-de-observacion.html" data-es="condiciones de observación">observing conditions</a></li>
+          <li><a href="https://science.nasa.gov/eclipses/safety/">NASA eclipse safety</a></li>
+          <li><a href="https://eclipse.aas.org/eye-safety">AAS eye safety</a> · <a href="https://eclipse.aas.org/eclipse-basics/eclipse-phenomena">AAS eclipse phenomena</a></li>
+          <li><a href="https://www.aemet.es/es/eltiempo/prediccion/municipios/horas/colmenar-viejo-id28045">AEMET: Colmenar Viejo</a> <span data-es="(consulta el pronóstico fechado; no es una garantía)">(check the timestamped forecast; it is not a guarantee)</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+  </div>
+
+  <div class="tab-panel" id="panel-method" data-tab-panel>
 
   <section id="pipeline">
     <div class="wrap prose">
@@ -528,7 +762,7 @@
           <table>
             <caption data-es="Dispersión del ensemble en la totalidad, con el centro del disco en longitud carringtoniana 224,5&deg;">Ensemble spread at totality, when the disk centre sits at Carrington longitude 224.5&deg;</caption>
             <thead>
-              <tr><th data-es="Región">Region</th><th class="num" data-es="Longitud carringtoniana">Carrington longitude</th><th class="num" data-es="Dispersión">Spread</th></tr>
+              <tr><th scope="col" data-es="Región">Region</th><th scope="col" class="num" data-es="Longitud carringtoniana">Carrington longitude</th><th scope="col" class="num" data-es="Dispersión">Spread</th></tr>
             </thead>
             <tbody>
               <tr><td data-es="Centro del disco">Disk centre</td><td class="num">224.5&deg;</td><td class="num">1.85 G</td></tr>
@@ -548,8 +782,8 @@
 
         <div class="note">
           <p class="note__title" data-es="una predicción pre-registrada sobre nuestro propio fallo">a pre-registered prediction about our own failure</p>
-          <p data-es="Si este modelo falla mañana, debería fallar <strong>de forma asimétrica, peor en el limbo este</strong>. Si falla de forma simétrica, el campo de la cara oculta no era el factor limitante y lo es otra cosa: la source surface, o el proxy de densidad. En cualquier caso aprendemos algo, que es más de lo que nos habría dado una imagen segura de sí misma.">
-            If this model fails tomorrow, it should fail <strong>asymmetrically,
+          <p data-es="La predicción preregistrada establece que, si el modelo falla, debería hacerlo <strong>de forma asimétrica, peor en el limbo este</strong>. Si falla de forma simétrica, el campo de la cara oculta no era el factor limitante y lo es otra cosa: la source surface, o el proxy de densidad. En cualquier caso aprendemos algo, que es más de lo que nos habría dado una imagen segura de sí misma.">
+            The preregistered prediction states that, if this model fails, it should fail <strong>asymmetrically,
             worse on the east limb</strong>. If it fails symmetrically, the
             far-side field was not the limiting factor and something else is —
             the source surface, or the density proxy. Either way we learn
@@ -605,84 +839,6 @@
     </div>
   </section>
 
-  <section id="explorer">
-    <div class="wrap">
-      <div class="prose">
-        <p class="eyebrow" data-es="// simulación">// simulation</p>
-        <h2 data-es="Mueve tú la source surface">Move the source surface yourself</h2>
-        <p data-es="No son la misma imagen a distintas escalas. Según baja R<sub>ss</sub>, la banda deja de ser una sola y se rompe en varios streamers distintos. Predicen eclipses visiblemente diferentes.">
-          These are not the same picture at different scales. As R<sub>ss</sub>
-          falls, the belt stops being a single band and breaks into several
-          distinct streamers. These predict visibly different eclipses.
-        </p>
-      </div>
-
-      <div class="sim">
-        <div class="sim__controls" role="group" aria-label="Source surface radius">
-          <button class="sim__btn" type="button" aria-pressed="false"
-                  hx-get="fragments/rss-1_3.html" hx-target="#rss-view" hx-swap="innerHTML">1.3 R&#9737;</button>
-          <button class="sim__btn" type="button" aria-pressed="false"
-                  hx-get="fragments/rss-1_5.html" hx-target="#rss-view" hx-swap="innerHTML">1.5 R&#9737;</button>
-          <button class="sim__btn" type="button" aria-pressed="false"
-                  hx-get="fragments/rss-2_0.html" hx-target="#rss-view" hx-swap="innerHTML">2.0 R&#9737;</button>
-          <button class="sim__btn" type="button" aria-pressed="true"
-                  hx-get="fragments/rss-2_5.html" hx-target="#rss-view" hx-swap="innerHTML">2.5 R&#9737;</button>
-          <button class="sim__btn" type="button" aria-pressed="false"
-                  hx-get="fragments/rss-3_0.html" hx-target="#rss-view" hx-swap="innerHTML">3.0 R&#9737;</button>
-        </div>
-
-        <div id="rss-view" aria-live="polite">
-          <figure class="sim__figure">
-            <img src="assets/rss/ss_2_5.png"
-                 alt="Source-surface radial field and neutral line for a source surface at 2.5 solar radii"
-                 width="1400" height="476">
-            <figcaption>
-              <strong>R<sub>ss</sub> = 2.5 R<sub>&#9737;</sub></strong> —
-              1.31 polarity reversals per longitude, open flux 7.2 G&nbsp;R<sub>&#9737;</sub><sup>2</sup>.
-              The conventional choice since Altschuler &amp; Newkirk (1969). One
-              dominant belt with a couple of excursions.
-            </figcaption>
-          </figure>
-        </div>
-
-        <p class="sim__hint">ADAPT-GONG 2026-08-11T04:00Z &middot; <span data-es="realización 0">realisation 0</span> &middot; nr = 100</p>
-      </div>
-
-      <div class="prose" style="margin-top:2rem">
-        <h3 data-es="Qué incertidumbre gana, dicho con cuidado">Which uncertainty wins, stated carefully</h3>
-        <p data-es="El flujo abierto varía 48 veces más entre las cinco source surfaces que entre las doce realizaciones del contorno. No vamos a liderar con ese número: el flujo abierto se mide <em>en la propia source surface</em>, cuyo radio es el parámetro que se varía, así que parte de ese cociente es definicional y no físico.">
-          Open flux varies 48&times; more across the five source surfaces than
-          across the twelve boundary realisations. We are not going to lead with
-          that number: open flux is measured <em>at the source surface</em>,
-          whose radius is the parameter being varied, so part of that ratio is
-          definitional rather than physical.
-        </p>
-        <p data-es="La métrica honesta es la que enseña de verdad un eclipse: dónde se sitúa la banda de streamers en el cielo.">
-          The honest metric is the one an eclipse actually shows — where the
-          streamer belt sits on the sky.
-        </p>
-
-        <div class="tablewrap">
-          <table>
-            <caption data-es="Dispersión RMS de la latitud de la línea neutra">RMS scatter in neutral-line latitude</caption>
-            <tbody>
-              <tr><td data-es="Entre 12 realizaciones ADAPT, R<sub>ss</sub> fijo">Across 12 ADAPT realisations, fixed R<sub>ss</sub></td><td class="num">5.3&deg;</td></tr>
-              <tr><td data-es="Entre 5 source surfaces, realización fija">Across 5 source surfaces, fixed realisation</td><td class="num">20.5&deg;</td></tr>
-              <tr><td data-es="<strong>Cociente</strong>"><strong>Ratio</strong></td><td class="num"><b>3.8&times;</b></td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <p data-es="Así que el orden se mantiene, con la magnitud corregida. La elección de source surface mueve la banda de streamers unas <strong>cuatro veces</strong> más que toda la incertidumbre de la cara oculta, no cincuenta. Las dos importan; el parámetro ficticio importa más.">
-          So the ranking survives with a corrected magnitude. The source-surface
-          choice moves the streamer belt about <strong>four times</strong> as
-          much as the entire far-side uncertainty — not fifty. Both matter; the
-          fictional parameter matters more.
-        </p>
-      </div>
-    </div>
-  </section>
-
   <section id="phase-c">
     <div class="wrap">
       <div class="prose">
@@ -725,7 +881,7 @@
           <table>
             <caption data-es="Superficie solar abierta, media del ensemble de 12 realizaciones">Open solar surface area, mean over the 12-realisation ensemble</caption>
             <thead>
-              <tr><th>R<sub>ss</sub></th><th class="num" data-es="Área abierta">Open area</th><th class="num" data-es="Dispersión del contorno">Boundary spread</th></tr>
+              <tr><th scope="col">R<sub>ss</sub></th><th scope="col" class="num" data-es="Área abierta">Open area</th><th scope="col" class="num" data-es="Dispersión del contorno">Boundary spread</th></tr>
             </thead>
             <tbody>
               <tr><td>1.3 R<sub>&#9737;</sub></td><td class="num">30.69%</td><td class="num">1.64 pp</td></tr>
@@ -752,15 +908,17 @@
       </div>
     </div>
   </section>
+  </div>
 
+  <div class="tab-panel" id="panel-prediction" data-tab-panel>
   <section id="prediction">
     <div class="wrap">
       <div class="prose">
         <p class="eyebrow" data-es="// fases D y E &mdash; completadas">// phases D and E &mdash; complete</p>
         <h2 data-es="La predicción">The prediction</h2>
-        <p data-es="Esto es lo que el modelo dice que se verá desde un campo al norte de Madrid mañana a las 20:31 CEST. El cénit está arriba, así que es la orientación que ve el ojo, no el convenio de norte solar arriba: el norte solar queda inclinado 34,7&deg; respecto a la vertical.">
-          This is what the model says the corona will look like from a field
-          north of Madrid at 20:31 CEST tomorrow. Zenith is up, so this is the
+        <p data-es="Esto es lo que el modelo, escrito antes de la totalidad, predijo para un campo al norte de Madrid el 12 de agosto de 2026 a las 20:31 CEST. El cénit está arriba, así que es la orientación que ve el ojo, no el convenio de norte solar arriba: el norte solar queda inclinado 34,7&deg; respecto a la vertical.">
+          This is what the model, written before totality, predicted for a field
+          north of Madrid on 12 August 2026 at 20:31 CEST. Zenith is up, so this is the
           orientation the eye sees, not the solar-north-up convention: solar
           north is tilted 34.7&deg; from vertical.
         </p>
@@ -797,12 +955,13 @@
 
         <div class="tablewrap">
           <table>
+            <caption data-es="Coste y comprobaciones del render final">Final render cost and checks</caption>
             <tbody>
-              <tr><td data-es="Evaluaciones del núcleo">Kernel evaluations</td><td class="num">415M<span data-es=" por fotograma"> per frame</span></td></tr>
-              <tr><td data-es="Tiempo de render">Render time</td><td class="num">118 s<span data-es=" (NumPy, CPU)"> (NumPy, CPU)</span></td></tr>
-              <tr><td data-es="Líneas de campo trazadas">Field lines traced</td><td class="num">884k</td></tr>
-              <tr><td data-es="Convergencia de la cuadratura">Quadrature convergence</td><td class="num">0.98%<span data-es=" peor caso"> worst case</span></td></tr>
-              <tr><td data-es="Memoria pico">Peak memory</td><td class="num"><b>1.8 GB</b></td></tr>
+              <tr><th scope="row" data-es="Evaluaciones del núcleo">Kernel evaluations</th><td class="num">415M<span data-es=" por fotograma"> per frame</span></td></tr>
+              <tr><th scope="row" data-es="Tiempo de render">Render time</th><td class="num">118 s<span data-es=" (NumPy, CPU)"> (NumPy, CPU)</span></td></tr>
+              <tr><th scope="row" data-es="Líneas de campo trazadas">Field lines traced</th><td class="num">884k</td></tr>
+              <tr><th scope="row" data-es="Convergencia de la cuadratura">Quadrature convergence</th><td class="num">0.98%<span data-es=" peor caso"> worst case</span></td></tr>
+              <tr><th scope="row" data-es="Memoria pico">Peak memory</th><td class="num"><b>1.8 GB</b></td></tr>
             </tbody>
           </table>
         </div>
@@ -821,22 +980,72 @@
             radial profile. Those are knobs, fixed <em>before</em> any comparison
             with Predictive Science so we cannot tune our way into agreement.
           </p>
-          <p data-es="Y la estructura es <strong>demasiado suave</strong>. Las coronas reales muestran estriaciones radiales finas; un campo potencial con una densidad de dos valores no puede producirlas. Si la corona de mañana es más afilada y filamentosa que esta &mdash; y lo será &mdash;, eso es el modelo de densidad fallando, no el renderizador.">
+          <p data-es="Y la estructura es <strong>demasiado suave</strong>. Las coronas reales muestran estriaciones radiales finas; un campo potencial con una densidad de dos valores no puede producirlas. Si la corona observada es más afilada y filamentosa que esta, eso es el modelo de densidad fallando, no el renderizador.">
             And the structure is <strong>too smooth</strong>. Real coronae show
             fine radial striations; a potential field with a two-valued density
-            proxy cannot produce them. If tomorrow's corona is sharper and more
-            filamentary than this — and it will be — that is the density model
+            proxy cannot produce them. If the observed corona is sharper and more
+            filamentary than this, that is the density model
             failing, not the renderer.
           </p>
         </div>
       </div>
     </div>
   </section>
+  </div>
 
+  <div class="tab-panel" id="panel-simulation" data-tab-panel>
+  <section id="explorer">
+    <div class="wrap">
+      <div class="prose">
+        <p class="eyebrow" data-es="// simulación">// simulation</p>
+        <h2 data-es="Mueve tú la source surface">Move the source surface yourself</h2>
+        <p data-es="No son la misma imagen a distintas escalas. Según baja R<sub>ss</sub>, la banda deja de ser una sola y se rompe en varios streamers distintos. Predicen eclipses visiblemente diferentes.">
+          These are not the same picture at different scales. As R<sub>ss</sub>
+          falls, the belt stops being a single band and breaks into several
+          distinct streamers. These predict visibly different eclipses.
+        </p>
+      </div>
+      <div class="sim">
+        <div class="sim__controls" role="group" aria-label="Source surface radius / Radio de la source surface">
+          <a class="sim__btn" href="assets/rss/ss_1_3.png" aria-pressed="false" hx-get="fragments/rss-1_3.html" hx-target="#rss-view" hx-swap="innerHTML">1.3 R&#9737;</a>
+          <a class="sim__btn" href="assets/rss/ss_1_5.png" aria-pressed="false" hx-get="fragments/rss-1_5.html" hx-target="#rss-view" hx-swap="innerHTML">1.5 R&#9737;</a>
+          <a class="sim__btn" href="assets/rss/ss_2_0.png" aria-pressed="false" hx-get="fragments/rss-2_0.html" hx-target="#rss-view" hx-swap="innerHTML">2.0 R&#9737;</a>
+          <a class="sim__btn" href="assets/rss/ss_2_5.png" aria-pressed="true" hx-get="fragments/rss-2_5.html" hx-target="#rss-view" hx-swap="innerHTML">2.5 R&#9737;</a>
+          <a class="sim__btn" href="assets/rss/ss_3_0.png" aria-pressed="false" hx-get="fragments/rss-3_0.html" hx-target="#rss-view" hx-swap="innerHTML">3.0 R&#9737;</a>
+        </div>
+        <div id="rss-view" aria-live="polite">
+          <figure class="sim__figure">
+            <img src="assets/rss/ss_2_5.png" alt="Source-surface radial field and neutral line for a source surface at 2.5 solar radii" width="1400" height="476">
+            <figcaption data-es="<strong>R<sub>ss</sub> = 2,5 R<sub>&#9737;</sub></strong> &mdash; 1,31 inversiones de polaridad por longitud, flujo abierto 7,2 G&nbsp;R<sub>&#9737;</sub><sup>2</sup>. La elección convencional desde Altschuler y Newkirk (1969). Una banda dominante con un par de desviaciones."><strong>R<sub>ss</sub> = 2.5 R<sub>&#9737;</sub></strong> &mdash; 1.31 polarity reversals per longitude, open flux 7.2 G&nbsp;R<sub>&#9737;</sub><sup>2</sup>. The conventional choice since Altschuler &amp; Newkirk (1969). One dominant belt with a couple of excursions.</figcaption>
+          </figure>
+        </div>
+        <p class="sim__hint">ADAPT-GONG 2026-08-11T04:00Z &middot; <span data-es="realización 0">realisation 0</span> &middot; nr = 100</p>
+      </div>
+      <div class="prose" style="margin-top:2rem">
+        <h3 data-es="Qué incertidumbre gana, dicho con cuidado">Which uncertainty wins, stated carefully</h3>
+        <p data-es="El flujo abierto varía 48 veces más entre las cinco source surfaces que entre las doce realizaciones del contorno. No vamos a liderar con ese número: el flujo abierto se mide <em>en la propia source surface</em>, cuyo radio es el parámetro que se varía, así que parte de ese cociente es definicional y no físico.">Open flux varies 48&times; more across the five source surfaces than across the twelve boundary realisations. We are not going to lead with that number: open flux is measured <em>at the source surface</em>, whose radius is the parameter being varied, so part of that ratio is definitional rather than physical.</p>
+        <p data-es="La métrica honesta es la que enseña de verdad un eclipse: dónde se sitúa la banda de streamers en el cielo.">The honest metric is the one an eclipse actually shows: where the streamer belt sits on the sky.</p>
+        <div class="tablewrap">
+          <table>
+            <caption data-es="Dispersión RMS de la latitud de la línea neutra">RMS scatter in neutral-line latitude</caption>
+            <tbody>
+              <tr><th scope="row" data-es="Entre 12 realizaciones ADAPT, R<sub>ss</sub> fijo">Across 12 ADAPT realisations, fixed R<sub>ss</sub></th><td class="num">5.3&deg;</td></tr>
+              <tr><th scope="row" data-es="Entre 5 source surfaces, realización fija">Across 5 source surfaces, fixed realisation</th><td class="num">20.5&deg;</td></tr>
+              <tr><th scope="row" data-es="Cociente">Ratio</th><td class="num"><b>3.8&times;</b></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p data-es="Así que el orden se mantiene, con la magnitud corregida. La elección de source surface mueve la banda de streamers unas <strong>cuatro veces</strong> más que toda la incertidumbre de la cara oculta, no cincuenta. Las dos importan; el parámetro ficticio importa más.">So the ranking survives with a corrected magnitude. The source-surface choice moves the streamer belt about <strong>four times</strong> as much as the entire far-side uncertainty, not fifty. Both matter; the fictional parameter matters more.</p>
+      </div>
+    </div>
+  </section>
+  </div>
+
+  <div class="tab-panel" id="panel-validation" data-tab-panel>
   <section id="next">
     <div class="wrap prose">
       <p class="eyebrow" data-es="// lo que queda">// what is left</p>
-      <h2 data-es="De aquí a la totalidad">Between here and totality</h2>
+      <h2 data-es="Validación después de la totalidad">Validation after totality</h2>
       <p data-es="La predicción está congelada. El <a href=&quot;validation-protocol.md&quot;>protocolo de evaluación post-eclipse</a> está preparado, pero todavía no se ha seleccionado ni puntuado una observación primaria. Predictive Science y otras referencias se tratarán por separado como análisis exploratorios.">
         The prediction is frozen. The <a href="validation-protocol.md">post-eclipse
         validation protocol</a> is prepared, but no primary observation has yet
@@ -863,6 +1072,7 @@
       </p>
     </div>
   </section>
+  </div>
 
 </main>
 
@@ -884,11 +1094,11 @@
 </footer>
 
 <script>
-  // Totality at Colmenar Viejo: 2026-08-12 20:31 CEST == 18:31 UTC.
+  // C2 at Colmenar Viejo: 2026-08-12 20:31:42 CEST == 18:31:42 UTC.
   (function () {
     var el = document.getElementById('countdown');
     if (!el) return;
-    var target = Date.UTC(2026, 7, 12, 18, 31, 0);
+    var target = Date.parse('2026-08-12T18:31:42Z');
     function tick() {
       var d = target - Date.now();
       if (d <= 0) { el.textContent = 'now'; return; }
@@ -901,14 +1111,81 @@
     tick();
   })();
 
-  // Keep the pressed state on the source-surface controls in sync.
-  document.addEventListener('click', function (e) {
-    var btn = e.target.closest('.sim__btn');
-    if (!btn) return;
-    btn.parentElement.querySelectorAll('.sim__btn').forEach(function (b) {
-      b.setAttribute('aria-pressed', String(b === btn));
+  // Change selection only after htmx has successfully replaced the figure.
+  document.body.addEventListener('htmx:afterSwap', function (event) {
+    var source = event.detail.requestConfig && event.detail.requestConfig.elt;
+    if (event.detail.target.id !== 'rss-view' || !source || !source.matches('.sim__btn')) return;
+    source.parentElement.querySelectorAll('.sim__btn').forEach(function (control) {
+      control.setAttribute('aria-pressed', String(control === source));
     });
   });
+
+  // Upgrade the anchor navigation to tabs only after scripting is running.
+  (function () {
+    var nav = document.querySelector('.tabs-nav__list');
+    var tabs = Array.from(document.querySelectorAll('[data-panel]'));
+    var panels = Array.from(document.querySelectorAll('[data-tab-panel]'));
+    if (!nav || tabs.length !== panels.length) return;
+
+    document.documentElement.classList.add('tabs-enhanced');
+    nav.setAttribute('role', 'tablist');
+    tabs.forEach(function (tab) {
+      var panel = document.getElementById(tab.dataset.panel);
+      tab.setAttribute('role', 'tab');
+      tab.setAttribute('aria-controls', panel.id);
+      panel.setAttribute('role', 'tabpanel');
+      panel.setAttribute('aria-labelledby', tab.id);
+      panel.setAttribute('tabindex', '0');
+    });
+
+    function panelForHash(hash) {
+      var target = hash && document.getElementById(hash.slice(1));
+      return target && target.closest('[data-tab-panel]');
+    }
+
+    function activate(panel, focusTab) {
+      var active = panel || panels[0];
+      tabs.forEach(function (tab) {
+        var selected = tab.dataset.panel === active.id;
+        tab.setAttribute('aria-selected', String(selected));
+        tab.setAttribute('tabindex', selected ? '0' : '-1');
+        document.getElementById(tab.dataset.panel).hidden = !selected;
+        if (selected && focusTab) tab.focus();
+      });
+    }
+
+    nav.addEventListener('click', function (event) {
+      var tab = event.target.closest('[role="tab"]');
+      if (!tab) return;
+      activate(document.getElementById(tab.dataset.panel), false);
+    });
+
+    nav.addEventListener('keydown', function (event) {
+      var tab = event.target.closest('[role="tab"]');
+      if (!tab) return;
+      var index = tabs.indexOf(tab);
+      var next = null;
+      if (event.key === 'ArrowRight') next = tabs[(index + 1) % tabs.length];
+      if (event.key === 'ArrowLeft') next = tabs[(index - 1 + tabs.length) % tabs.length];
+      if (event.key === 'Home') next = tabs[0];
+      if (event.key === 'End') next = tabs[tabs.length - 1];
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        tab.click();
+        return;
+      }
+      if (next) {
+        event.preventDefault();
+        next.click();
+        next.focus();
+      }
+    });
+
+    window.addEventListener('hashchange', function () {
+      activate(panelForHash(window.location.hash), false);
+    });
+    activate(panelForHash(window.location.hash), false);
+  })();
 
   // ---- language toggle -------------------------------------------------
   // English is authored inline so the page is fully readable with no JS and
@@ -923,6 +1200,16 @@
 
     function apply(lang, root) {
       nodes(root).forEach(function (el) {
+        if (el.matches('.tabs-nav__list')) {
+          if (!el.hasAttribute('data-en-label')) el.setAttribute('data-en-label', el.getAttribute('aria-label'));
+          el.setAttribute('aria-label', el.getAttribute(lang === 'es' ? 'data-es' : 'data-en-label'));
+          return;
+        }
+        if (el.matches('[data-panel], .bar__link')) {
+          if (!el.hasAttribute('data-en-text')) el.setAttribute('data-en-text', el.textContent);
+          el.textContent = el.getAttribute(lang === 'es' ? 'data-es' : 'data-en-text');
+          return;
+        }
         if (!el.hasAttribute('data-en')) {
           el.setAttribute('data-en', el.innerHTML);
         }
