@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>corona26 — predicting the 2026 eclipse corona from real magnetic-field data</title>
-<meta name="description" content="A PFSS reconstruction and Thomson-scattering renderer that predicts the solar corona of the 12 August 2026 total eclipse; post-eclipse validation is prepared but not yet run.">
+<meta name="description" content="A PFSS reconstruction and Thomson-scattering prediction for the 12 August 2026 eclipse; its general shape now has qualitative support, while the official score remains pending.">
 <meta property="og:title" content="corona26 — predicting the 2026 eclipse corona from a real magnetic field">
 <meta property="og:description" content="Real magnetogram to PFSS ensemble to Thomson scattering. Timestamped before totality, graded by the Sun.">
 <meta property="og:type" content="website">
@@ -310,9 +310,6 @@
   }
   .status b { color: var(--accent); font-weight: 600; }
 
-  #countdown { font-variant-numeric: tabular-nums; }
-  .countdown-warning { margin-top: 0.65rem; }
-
   /* ---------- pipeline ---------- */
 
   .pipe {
@@ -529,16 +526,11 @@
       </p>
 
       <ul class="status">
-        <li><span data-es="Totalidad en">Totality in</span> <b id="countdown">&mdash;</b></li>
+        <li><span data-es="Totalidad observada">Totality observed</span> <b>2026-08-12</b></li>
         <li><span data-es="Condición de contorno">Boundary condition</span> <b>2026-08-11 04:00 UTC</b></li>
         <li><span data-es="Ensemble">Ensemble</span> <b><span data-es="60 miembros">60 members</span></b></li>
-        <li><span data-es="Fase">Phase</span> <b><span data-es="E de G">E of G</span></b></li>
+        <li><span data-es="Fase">Phase</span> <b><span data-es="Validación en curso">Validation underway</span></b></li>
       </ul>
-      <p class="sim__hint countdown-warning" data-es="Cuenta atrás orientativa hasta C2. NO autoriza a quitarse las gafas: manda la señal física, y solo se retiran cuando haya desaparecido TODA la fotosfera.">
-        Approximate countdown to C2. It does NOT authorise removing solar viewers:
-        the physical signal takes priority, and viewers come off only after ALL of
-        the photosphere has disappeared.
-      </p>
     </div>
   </div>
 
@@ -1043,33 +1035,105 @@
 
   <div class="tab-panel" id="panel-validation" data-tab-panel>
   <section id="next">
-    <div class="wrap prose">
-      <p class="eyebrow" data-es="// lo que queda">// what is left</p>
-      <h2 data-es="Validación después de la totalidad">Validation after totality</h2>
-      <p data-es="La predicción está congelada. El <a href=&quot;validation-protocol.md&quot;>protocolo de evaluación post-eclipse</a> está preparado, pero todavía no se ha seleccionado ni puntuado una observación primaria. Predictive Science y otras referencias se tratarán por separado como análisis exploratorios.">
-        The prediction is frozen. The <a href="validation-protocol.md">post-eclipse
-        validation protocol</a> is prepared, but no primary observation has yet
-        been selected or scored. Predictive Science and other references will
-        be handled separately as exploratory analyses.
-      </p>
+    <div class="wrap">
+      <div class="prose">
+        <p class="eyebrow" data-es="// comprobación post-eclipse">// post-eclipse check</p>
+        <h2 data-es="La forma general está parcialmente apoyada">General shape partially supported</h2>
 
-      <div class="note">
-        <p class="note__title" data-es="la regla con la que funciona este proyecto">the rule this project runs on</p>
-        <p data-es="La predicción y el magnetograma del que sale se commitean y se suben <strong>antes de la totalidad</strong>, con la hora de observación de entrada registrada. El historial de git es la prueba. Una predicción publicada después no es una predicción.">
-          The prediction and the magnetogram it came from are committed and
-          pushed <strong>before totality</strong>, with the input observation
-          time recorded. The git history is the evidence. A prediction published
-          afterwards is not a prediction.
+        <div class="note" role="note">
+          <p class="note__title" data-es="provisional · solo cualitativo">provisional · qualitative only</p>
+          <p data-es="Seis fotogramas del <a href=&quot;https://www.youtube.com/watch?v=j2TjlTbHwsw&quot;>feed telescópico oficial de ESA/Javalambre</a>, entre <strong>01:03:50 y 01:04:40</strong>, muestran de forma estable una corona no circular y multipolar, con aproximadamente 3&ndash;4 grandes abanicos y una extensión visual de ~2&ndash;2,5 R<sub>&#9737;</sub>. Esa morfología gruesa es compatible con la predicción congelada, pero <strong>no constituye una puntuación oficial</strong>.">
+            Six frames from the <a href="https://www.youtube.com/watch?v=j2TjlTbHwsw">official
+            ESA/Javalambre telescope feed</a>, between <strong>01:03:50 and
+            01:04:40</strong>, consistently show a non-circular, multipolar corona
+            with roughly 3&ndash;4 broad fans and a visual extent of ~2&ndash;2.5
+            R<sub>&#9737;</sub>. That coarse morphology is compatible with the frozen
+            prediction, but <strong>it is not an official score</strong>.
+          </p>
+        </div>
+
+        <div class="guide-grid">
+          <article class="guide-card">
+            <h3 data-es="Coincidencias cualitativas">Qualitative matches</h3>
+            <ul>
+              <li data-es="Carácter multipolar, no una corona circular uniforme.">Multipolar character rather than a uniform circular corona.</li>
+              <li data-es="Aproximadamente 3&ndash;4 sectores coronales anchos.">Roughly 3&ndash;4 broad coronal sectors.</li>
+              <li data-es="Extensión radial visual comparable.">Comparable visual radial extent.</li>
+              <li data-es="La estructura gruesa se mantiene entre exposiciones del feed.">The coarse structure remains stable across feed exposures.</li>
+            </ul>
+          </article>
+          <article class="guide-card">
+            <h3 data-es="Discrepancias visibles">Visible discrepancies</h3>
+            <ul>
+              <li data-es="La corona real es más filamentaria y abrupta.">The real corona is more filamentary and abrupt.</li>
+              <li data-es="El brillo está más concentrado y menos equilibrado.">Brightness is more concentrated and less balanced.</li>
+              <li data-es="El proxy de densidad del modelo es demasiado suave.">The model's density proxy is too smooth.</li>
+              <li data-es="El modelo no predice prominencias.">The model does not predict prominences.</li>
+            </ul>
+          </article>
+        </div>
+
+        <h3 data-es="Por qué aún no se puede puntuar">Why it cannot be scored yet</h3>
+        <p data-es="El feed disponible es vídeo 1920&times;1080 comprimido y no documenta norte solar, paridad óptica ni calibración. Por tanto, no permite emparejar ángulos de posición (PA), comprobar la asimetría este-oeste preregistrada ni medir con rigor la extensión radial. El estado es <code>qualitative_only</code>; la puntuación oficial sigue pendiente.">
+          The available feed is compressed 1920&times;1080 video and does not
+          document solar north, optical parity or calibration. It therefore
+          cannot support position-angle (PA) matching, test the preregistered
+          east-west asymmetry, or rigorously measure radial extent. Its status is
+          <code>qualitative_only</code>; the official score remains pending.
         </p>
-      </div>
 
-      <p data-es="Tener éxito aquí no significa que la corona coincida. Significa que la cadena funciona, que las figuras existen y que las aproximaciones están declaradas con honestidad. Si coincide, es un resultado; si no, averiguar por qué es un resultado mejor. El modo de fallo no es una predicción equivocada: es no tener predicción.">
-        Success here does not mean the corona matches. It means the pipeline
-        runs, the figures exist, and the approximations are stated honestly. If
-        it matches, that is a result; if it does not, working out why is a
-        better one. The failure mode is not a wrong prediction — it is no
-        prediction.
-      </p>
+        <div class="tablewrap">
+          <table>
+            <caption data-es="Estado de candidatos a observación primaria, corte: 12/08/2026 21:34 CEST">Primary-observation candidate status, as of 12 Aug 2026 21:34 CEST</caption>
+            <thead>
+              <tr><th scope="col" data-es="Fuente">Source</th><th scope="col" data-es="Provenance disponible">Available provenance</th><th scope="col" data-es="Bloqueo para score oficial">Official-score blocker</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row"><a href="https://commons.wikimedia.org/wiki/File:Eclipse_solar_total_12_de_agosto_de_2026_desde_Logro%C3%B1o.jpg">Commons · Logroño</a></th>
+                <td data-es="JPEG 3000&times;4000; EXIF 18:28:20 UTC; GPS; CC BY-SA 3.0.">3000&times;4000 JPEG; EXIF 18:28:20 UTC; GPS; CC BY-SA 3.0.</td>
+                <td data-es="<code>CustomRendered</code>; cadena óptica, paridad y cobertura hasta 2,5 R<sub>&#9737;</sub> no certificables."><code>CustomRendered</code>; optical chain, parity and coverage to 2.5 R<sub>&#9737;</sub> cannot be certified.</td>
+              </tr>
+              <tr>
+                <th scope="row"><a href="https://trioeclipses.es/directo">IGN/OAN · Yebes</a></th>
+                <td data-es="Torre Solar institucional, luz blanca.">Institutional Solar Tower, white light.</td>
+                <td data-es="Stream sin RAW/FITS, orientación ni calibración.">Stream without RAW/FITS, orientation or calibration.</td>
+              </tr>
+              <tr>
+                <th scope="row"><a href="https://www.iac.es/es/divulgacion/noticias">IAC/NATE</a></th>
+                <td data-es="Programa observacional institucional.">Institutional observing programme.</td>
+                <td data-es="Todavía no hay originales públicos aptos.">No suitable public originals yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p><strong><code>official_candidate: none_available</code></strong></p>
+        <p data-es="El <a href=&quot;validation-protocol.md&quot;>protocolo oficial de evaluación</a> exige seleccionar primero una observación por su provenance, antes de comparar su morfología. Esperar datos mejores protege el resultado frente a escoger, después de verla, la imagen que más favorezca la predicción.">
+          The <a href="validation-protocol.md">official validation protocol</a>
+          requires selecting an observation by provenance before comparing its
+          morphology. Waiting for better data protects the result from choosing,
+          after inspection, whichever image most favours the prediction.
+        </p>
+
+        <details>
+          <summary data-es="Nota de reproducibilidad">Reproducibility note</summary>
+          <p data-es="La comprobación cualitativa usó seis fotogramas distribuidos entre 01:03:50 y 01:04:40 del feed enlazado. No se han incrustado imágenes de terceros ni se han utilizado estos fotogramas para ejecutar el protocolo oficial.">
+            The qualitative check used six frames distributed from 01:03:50 to
+            01:04:40 in the linked feed. No third-party images are embedded, and
+            these frames were not used to run the official protocol.
+          </p>
+        </details>
+
+        <div class="note" style="margin-top:1.5rem">
+          <p class="note__title" data-es="la predicción sigue siendo previa">the prediction remains prior</p>
+          <p data-es="La predicción y el magnetograma del que procede se publicaron <strong>antes de la totalidad</strong>, con la hora de observación de entrada registrada. Esta comprobación posterior no modifica esos artefactos ni su historial.">
+            The prediction and its source magnetogram were published <strong>before
+            totality</strong>, with the input observation time recorded. This later
+            check does not modify those artefacts or their history.
+          </p>
+        </div>
+      </div>
     </div>
   </section>
   </div>
@@ -1094,23 +1158,6 @@
 </footer>
 
 <script>
-  // C2 at Colmenar Viejo: 2026-08-12 20:31:42 CEST == 18:31:42 UTC.
-  (function () {
-    var el = document.getElementById('countdown');
-    if (!el) return;
-    var target = Date.parse('2026-08-12T18:31:42Z');
-    function tick() {
-      var d = target - Date.now();
-      if (d <= 0) { el.textContent = 'now'; return; }
-      var h = Math.floor(d / 3600000);
-      var m = Math.floor(d / 60000) % 60;
-      var s = Math.floor(d / 1000) % 60;
-      el.textContent = h + 'h ' + String(m).padStart(2, '0') + 'm ' + String(s).padStart(2, '0') + 's';
-      setTimeout(tick, 1000);
-    }
-    tick();
-  })();
-
   // Change selection only after htmx has successfully replaced the figure.
   document.body.addEventListener('htmx:afterSwap', function (event) {
     var source = event.detail.requestConfig && event.detail.requestConfig.elt;

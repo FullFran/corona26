@@ -3,7 +3,6 @@ from contextlib import contextmanager
 from html.parser import HTMLParser
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-import re
 from threading import Thread
 from urllib.parse import urlparse
 from urllib.request import urlopen
@@ -140,14 +139,59 @@ def test_five_progressively_enhanced_tabs_match_panels():
     assert "el.setAttribute('aria-label'" in html
 
 
-def test_countdown_targets_exact_c2_and_is_not_a_safety_signal():
+def test_hero_reports_post_eclipse_validation_status():
     html, _ = load_site()
-    target = re.search(r"var target = Date\.parse\('([^']+)'\);", html)
-    assert target and target.group(1) == "2026-08-12T18:31:42Z"
-    assert "Cuenta atrás orientativa hasta C2" in html
-    assert "NO autoriza a quitarse las gafas" in html
-    assert "manda la señal física" in html
-    assert "TODA la fotosfera" in html
+    assert "Totality observed" in html
+    assert "Totalidad observada" in html
+    assert "Validation underway" in html
+    assert "Validación en curso" in html
+    assert 'id="countdown"' not in html
+    assert "Totality in" not in html
+
+
+def test_validation_is_provisional_and_not_an_official_claim():
+    html, _ = load_site()
+    panel = html[html.index('id="panel-validation"') : html.index("</main>")]
+    assert "General shape partially supported" in panel
+    assert "La forma general está parcialmente apoyada" in panel
+    assert "provisional · qualitative only" in panel
+    assert "qualitative_only" in panel
+    assert "the official score remains pending" in panel
+    assert "it is not an official score" in panel
+
+    strong_claims = [
+        "partially confirmed",
+        "parcialmente confirmada",
+        "prediction validated",
+        "predicción validada",
+        "acierto demostrado",
+    ]
+    assert not [claim for claim in strong_claims if claim in panel.lower()]
+
+
+def test_validation_records_esa_evidence_candidate_state_and_sources():
+    html, site = load_site()
+    required = [
+        "01:03:50",
+        "01:04:40",
+        "Six frames",
+        "3&ndash;4 broad",
+        "~2&ndash;2.5",
+        "official_candidate: none_available",
+        "12 Aug 2026 21:34 CEST",
+        "CustomRendered",
+        "No suitable public originals yet",
+    ]
+    assert not [text for text in required if text not in html]
+
+    sources = {
+        "https://www.youtube.com/watch?v=j2TjlTbHwsw",
+        "https://commons.wikimedia.org/wiki/File:Eclipse_solar_total_12_de_agosto_de_2026_desde_Logro%C3%B1o.jpg",
+        "https://trioeclipses.es/directo",
+        "https://www.iac.es/es/divulgacion/noticias",
+        "validation-protocol.md",
+    }
+    assert sources <= set(site.links)
 
 
 def test_rss_selection_follows_successful_swap_and_has_no_js_fallback():
